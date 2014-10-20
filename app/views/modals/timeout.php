@@ -15,5 +15,5 @@ if (is_object (limbo::ioc ('auth')))
 </div>
 
 <div class="textc">
-	<a href="<?php echo $root?>testing/auth/?redirect=<?php echo @limbo::request()->url?>" class="button"> OK </a>
+	<a href="<?php echo $root?>testing/auth/?redirect=<?php echo base64_encode (@limbo::request()->url)?>" class="button"> OK </a>
 </div>
