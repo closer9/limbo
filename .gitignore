@@ -1,0 +1,8 @@
+.idea
+
+/app/crons/**
+/app/storage/logs/
+/app/configs/*.config.php
+
+!/app/crons/scheduler.php
+!/app/configs/default.config.php
