@@ -1,0 +1,75 @@
+body {
+	background: #ffffff url('../../images/background.jpg') fixed;
+	color: #e7e7e7;
+	font: 13px/15px  "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	line-height: 1.5em;
+	margin: 10px auto;
+	width: 1000px;
+	}
+
+li { list-style: none; }
+table>thead td { padding-top: 4px; }
+
+a { color: #ffffff; text-decoration: underline; }
+a:active { outline: none; }
+
+header.splash {
+	text-align: center;
+	}
+
+header.splash .limbo {
+	font-weight: bold;
+	font-size: 10em;
+	line-height: 2em;
+	font-family: Arial, Helvetica, Geneva, sans-serif;
+	opacity: .5;
+	}
+
+header.splash .links a {
+	margin-top: 1em;
+	text-decoration: none;
+	transition: all 0.3s ease-in;
+	padding-right: 30px;
+	}
+
+header.splash .links a:hover,
+header.splash .links a:focus,
+header.splash .links a:active {
+	text-shadow: 1px 0 5px #ffffff;
+	transition: width 0.1s;
+	}
+
+header.standard {
+	margin-bottom: 20px;
+	}
+
+header.standard .limbo {
+	font-weight: bold;
+	font-size: 4em;
+	line-height: 45px;
+	color: #e7e7e7;
+	float: left;
+	font-family: Arial, Helvetica, Geneva, sans-serif;
+	opacity: .7;
+	}
+
+header.standard .links {
+	background-color: #e7e7e7;
+	height: 42px;
+	margin-left: 180px;
+	line-height: 45px;
+	opacity: .7;
+	}
+
+header.standard .limbo a {
+	color: #e7e7e7;
+	text-decoration: none;
+	}
+
+header.standard .version {
+	color: #000000;
+	font-weight: bold;
+	padding-right: 1em;
+	}
+
+#popup-box { background-color: #797a79; color: #151615; }

@@ -1,0 +1,26 @@
+RewriteEngine on
+
+# You may need to specify the base path here
+# RewriteBase /
+
+RewriteRule \.git - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !=/favicon.ico
+RewriteRule ^(.*)$ ?pid=$1 [QSA,L]
+
+# Setup cacheing for non-text files
+<IfModule mod_expires.c>
+	<FilesMatch "\\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+		ExpiresActive on
+		ExpiresDefault "access plus 1 hour"
+	</FilesMatch>
+</IfModule>
+
+# Setup compression for text based files
+<IfModule mod_deflate.c>
+	<FilesMatch "\\.(js|css|html|htm|php|xml)$">
+		SetOutputFilter DEFLATE
+	</FilesMatch>
+</IfModule>
