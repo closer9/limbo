@@ -511,7 +511,7 @@ class mysql
 			else
 				{
 				// If the marker is already quoted, don't add quotes
-				if (preg_match ("#`|'|\"#", $query[$position - 1]) && preg_match ("#`|'|\"#", $query[$position + 3]))
+				if (preg_match ("#`|'|\"#", @$query[$position - 1]) || preg_match ("#`|'|\"#", @$query[$position + 3]))
 					{
 					$replace = $this->clean ($variable);
 					}
