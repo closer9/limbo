@@ -14,9 +14,9 @@ if (config ('database.options'))
 		limbo::ioc ('auth', function ($c) {
 			$auth = new \limbo\auth (config ('auth.options'), $c['sql']);
 		
-			if ($block = $auth->blocked_check ($auth->address))
+			if ($reason = $auth->blocked_check ($auth->address))
 				{
-				throw new limbo\error ("Access denied. Reason: {$block}", array (
+				throw new limbo\error ("Access denied. Reason: {$reason}", array (
 					'simple' 	=> true,
 					'response' 	=> 401
 					));
