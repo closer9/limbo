@@ -292,10 +292,7 @@ class mysql
 		{
 		if (! empty ($input));
 			{
-			if (strpos ('\\', $input) !== false)
-				{
-				$input = stripslashes ($input);
-				}
+			$input = stripslashes ($input);
 			
 			// Try to clean up any windows style newlines
 			$input = preg_replace ("/\\\\r\\\\n/", "\r\n", $input);
