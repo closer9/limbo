@@ -29,13 +29,11 @@ if (config ('database.options'))
 		}
 	}
 
-$bbcode	= new limbo\util\bbcode ();
 $smtp	= new limbo\util\smtp ();
 $path	= limbo::request ()->path;
 $root 	= config ('web.root');
 
 register (array (
-	'bbcode'	=> $bbcode,
 	'smtp'		=> $smtp,
 	'path'		=> $path,
 	'root'		=> $root

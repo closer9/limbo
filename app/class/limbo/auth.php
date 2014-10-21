@@ -963,7 +963,7 @@ class auth
 			if ($this->db_info)
 				{
 				// Collect any additional information about the user
-				$info = $this->sql->select (array ('authid', $user['authid']), $this->db_info);
+				$info = $this->sql->select (array ('authid' => $user['authid']), $this->db_info);
 				
 				if (isset ($info['authid']))
 					{
@@ -975,13 +975,13 @@ class auth
 			if ($this->db_groups && $user['group'] > 0)
 				{
 				// Collect any group data from the database
-				$user['groupdata'] = $this->sql->select (array ('group', $user['group']), $this->db_groups);
+				$user['groupdata'] = $this->sql->select (array ('group' => $user['group']), $this->db_groups);
 				}
 			
 			if ($this->db_settings)
 				{
 				// Collect any user program settings
-				$user['settings'] = $this->sql->select (array ('authid', $user['authid']), $this->db_settings);
+				$user['settings'] = $this->sql->select (array ('authid' => $user['authid']), $this->db_settings);
 				}
 			
 			if ($update_class)

@@ -35,12 +35,12 @@ object		{ outline: 0 none; }
 p			{ padding: 0em 0em; }
 pre, code	{ font-family: monospace, sans-serif; }
 
-h1 { font: normal 2.1em/1em; padding-bottom: 0.5em; }
-h2 { font: normal 1.8em/0.75em; padding-bottom: 0.75em; }
-h3 { font: normal 1.7em/1em; padding-bottom: 0.75em; }
-h4 { font: bold 1.25em/1.35em; padding-bottom: 0.25em; }
-h5 { font: bold 1em; padding-bottom: .1em; }
-h6 { font: bold 1em; }
+h1 { font: normal 2.1em/1em Georgia, serif; padding-bottom: 0.5em; }
+h2 { font: normal 1.8em/0.75em Georgia, serif; padding-bottom: 0.75em; }
+h3 { font: normal 1.7em/1em Georgia, serif; padding-bottom: 0.75em; }
+h4 { font: bold 1.25em/1.35em Helvetica; padding-bottom: 0.25em; }
+h5 { font: bold 1em Helvetica; padding-bottom: .1em; }
+h6 { font: bold 1em Helvetica; }
 
 /* Setup quoting markup */
 blockquote, q { quotes: none; }

@@ -95,6 +95,22 @@ if (! function_exists ('update_title'))
 		}
 	}
 
+if (! function_exists ('hash_create'))
+	{
+	function hash_create ($input, $record_time = false)
+		{
+		return limbo\util\security::hash_create ($input, $record_time);
+		}
+	}
+
+if (! function_exists ('hash_verify'))
+	{
+	function hash_verify ($hash, $input, $timeout = false)
+		{
+		return limbo\util\security::hash_verify ($hash, $input, $timeout);
+		}
+	}
+
 if ( ! function_exists('dd'))
 	{
 	function dd ()
