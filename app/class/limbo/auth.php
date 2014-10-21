@@ -269,7 +269,7 @@ class auth
 	 *
 	 * @return bool
 	 */
-	private function record_event ($status, $event = '', $username = '')
+	public function record_event ($status, $event = '', $username = '')
 		{
 		if ($this->db_logins)
 			{
