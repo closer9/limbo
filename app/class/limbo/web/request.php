@@ -24,7 +24,7 @@ class request
 	
 	// User information
 	public $ip;				// The users IP address				50.34.2.206
-	public $user_agent;		// The useragent					Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4)
+	public $useragent;		// The useragent					Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4)
 	
 	// Request information
 	public $server;			// The server name					limbo.neg9.com
@@ -68,7 +68,7 @@ class request
 			'port'			=> self::get_value ('SERVER_PORT'),
 			'ajax' 			=> self::get_ajax (),
 			'scheme' 		=> self::get_value ('SERVER_PROTOCOL', 'HTTP/1.1'),
-			'user_agent' 	=> self::get_value ('HTTP_USER_AGENT'),
+			'useragent' 		=> self::get_value ('HTTP_USER_AGENT'),
 			'type' 			=> self::get_value ('CONTENT_TYPE'),
 			'length' 		=> self::get_value ('CONTENT_LENGTH', self::get_length ()),
 			'secure' 		=> self::get_value ('HTTPS', 'no') != 'no',
