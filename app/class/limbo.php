@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1131';
+	public static $version	= '0.1.5.1135';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -75,7 +75,7 @@ class limbo
 	 *
 	 * If this is from a CLI call then the rest of the processing is done there.
 	 */
-	public function __construct ()
+	public function __construct ($bootstrap_only = false)
 		{
 		require (__DIR__ . '/../startup/helpers.php');
 		
@@ -121,7 +121,7 @@ class limbo
 		// Is this a website request?
 		if (self::invoked_from () == 'web')
 			{
-			$this->web_init ();
+			$this->web_init ($bootstrap_only);
 			}
 		}
 	
@@ -163,7 +163,7 @@ class limbo
 	/**
 	 * This is the main processing unit of the application for web requests.
 	 */
-	public function web_init ()
+	public function web_init ($bootstrap_only = false)
 		{
 		config ('web.protocol', ((config ('web.ssl')) ? 'https' : 'http'));
 		
@@ -233,6 +233,12 @@ class limbo
 		require (__DIR__ . '/../startup/startup.php');
 		require (__DIR__ . '/../startup/routes.php');
 		require (__DIR__ . '/../startup/custom.php');
+		
+		if ($bootstrap_only)
+			{
+			// We don't want to do any rendering
+			return;
+			}
 		
 		// Collect any section config files
 		$this->load_section ();
