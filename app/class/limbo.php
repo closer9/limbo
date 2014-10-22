@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1130';
+	public static $version	= '0.1.5.1131';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -54,9 +54,9 @@ class limbo
 	public static $globals;
 	
 	/**
-	 * @var object The main router object
+	 * @var object The micro timestamp of when the framework started up
 	 */
-	private static $router;
+	public static $startup;
 	
 	/**
 	 * @var object Our lovely IoC controller Pimple
@@ -81,6 +81,8 @@ class limbo
 		
 		$this->load_config ();
 		$this->autoload_registration ();
+		
+		self::$startup = \limbo\util\time::microtime_float ();
 		
 		set_error_handler (array ('\limbo', 'error_handler'));
 		
@@ -432,7 +434,6 @@ class limbo
 	
 	public static function router ()
 		{
-		//return self::$router;
 		return self::ioc ('router');
 		}
 	
