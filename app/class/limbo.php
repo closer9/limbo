@@ -599,7 +599,14 @@ class limbo
 			return;
 			}
 		
-		throw new \limbo\error ("{$string} ({$file} [{$line}])");
+		if ($number & (E_NOTICE + E_WARNING + E_USER_NOTICE + E_USER_WARNING + E_USER_ERROR))
+			{
+			echo "<b>Error</b>: {$string} ({$file} [{$line}])<br>";
+			}
+			else
+			{
+			throw new \limbo\error ("{$string} ({$file} [{$line}])");
+			}
 		}
 	
 	/**
