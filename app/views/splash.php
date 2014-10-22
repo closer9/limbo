@@ -30,7 +30,7 @@
 
 	<script type="text/javascript">
 		// <![CDATA[
-		var query 		= '<?php echo base64_encode (limbo::request()->url)?>';
+		var query 		= '<?php echo base64_encode (limbo::request()->query)?>';
 		var authid		= <?php echo (isset ($AUTH) && $AUTH->authid) ? $AUTH->authid : 0?>;
 		var path		= '<?php echo config ('web.root')?>';
 

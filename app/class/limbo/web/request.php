@@ -14,6 +14,7 @@ use \limbo\util\collection;
 class request
 	{
 	// Page information
+	public $query;			// The query string of the request	pid=testing/request&t=1
 	public $url;			// The raw url from the browser		/testing/request/?t=1
 	public $pid;			// What the fixed url should be		/testing/request/index
 	public $path;			// The local dir for the request	/testing/request/
@@ -54,6 +55,7 @@ class request
 	public function __construct (array $config = array())
 		{
 		$defaults = array (
+			'query' 		=> self::get_value ('QUERY_STRING', ''),
 			'url' 			=> self::get_value ('REQUEST_URI', '/'),
 			'pid'			=> self::get_pid (),
 			'path'			=> substr (self::get_pid (), 0, strrpos ($this->pid, '/') + 1),
