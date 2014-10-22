@@ -214,11 +214,11 @@ class mysql
 	 * 
 	 * @return array
 	 */
-	public function get_tables ()
+	public function get_tables ($fresh = false)
 		{
 		static $return = array ();
 		
-		if (count ($return) == 0)
+		if ($fresh || count ($return) == 0)
 			{
 			$result = $this->prepare ("SHOW TABLES FROM `?`", array ($this->db_database));
 			
