@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" promptOnRemoteOverwrite="CHECK_TIMESTAMP" serverName="limbo.neg9.com" deleteMissingItems="true" createEmptyFolders="true" uploadOnCheckin="8111a9ac-7251-48c3-9f03-6b9ccfe3e218" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="limbo.neg9.com">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myUploadOnCheckinName" value="limbo.neg9.com" />
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

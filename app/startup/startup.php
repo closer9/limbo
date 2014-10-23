@@ -29,12 +29,15 @@ if (config ('database.options'))
 		}
 	}
 
-$smtp	= new limbo\util\smtp ();
+limbo::ioc ('smtp', function () {
+	return new limbo\util\smtp ();
+	});
+
 $path	= limbo::request ()->path;
 $root 	= config ('web.root');
 
 register (array (
-	'smtp'		=> $smtp,
+	'smtp'		=> limbo::ioc ('smtp'),
 	'path'		=> $path,
 	'root'		=> $root
-	));
+));
