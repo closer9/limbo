@@ -197,6 +197,9 @@ class limbo
 				->send ();
 			}
 		
+		// Generate an easy to call web url
+		config ('web.http', config ('web.protocol') . '://' . config ('web.hostname') . config ('web.root'));
+		
 		limbo\log::debug ('Web request for: ' . self::request()->url);
 		
 		// Start the output buffer
