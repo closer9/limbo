@@ -83,6 +83,12 @@ function javascript_init ()
 			disable_popup ();
 			}
 		});
+	
+	// Allow for a custom init function
+	if (typeof custom_init == 'function')
+		{
+		custom_init ();
+		}
 
 	reload_popups ();
 	}
