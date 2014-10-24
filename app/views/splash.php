@@ -30,8 +30,8 @@
 
 	<script type="text/javascript">
 		// <![CDATA[
-		var query 		= '<?php echo base64_encode (limbo::request()->query)?>';
-		var authid		= <?php echo (isset ($AUTH) && $AUTH->authid) ? $AUTH->authid : 0?>;
+		var query 		= '<?php echo base64_encode (substr (limbo::request()->query, 4))?>';
+		var authid		= <?php echo (isset ($AUTH) && $AUTH->verified) ? $AUTH->authid : 0?>;
 		var path		= '<?php echo config ('web.root')?>';
 
 		$(document).ready (function ()
@@ -50,22 +50,21 @@
 </head>
 
 <body>
-<a id="top" name="top"></a>
-
-<header class="splash">
-	<div class="limbo">LIMBO</div>
-</header>
-
-<br>
-
-<div class="textc white m20">
-	<?php
-	if (! is_writable (config ('path.storage')))
-		{
-		echo '<p>The storage directory is not writable.</p>';
-		}
-	?>
-</div>
-
+	<a id="top" name="top"></a>
+	
+	<header class="splash">
+		<div class="limbo">LIMBO</div>
+	</header>
+	
+	<br>
+	
+	<div class="textc white m20">
+		<?php
+		if (! is_writable (config ('path.storage')))
+			{
+			echo '<p>The storage directory is not writable.</p>';
+			}
+		?>
+	</div>
 </body>
 </html>
