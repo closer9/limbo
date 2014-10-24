@@ -87,45 +87,44 @@ class security
 	 * @param  string $data The unencrypted data
 	 * @param  string $key The encryption key
 	 * @param  string $iv The encryption initialization vector
-	 * @param  array  $settings Optional key-value array with custom algorithm and mode
 	 * 
 	 * @return string
+	 * @throws \limbo\error if mcrypt is not loaded
 	 */
-	public static function encrypt ($data, $key, $iv, $settings = array ())
+	public static function encrypt ($data, $key, $iv = '')
 		{
-		if ($data === '' || !extension_loaded ('mcrypt'))
+		if (! extension_loaded ('mcrypt'))
 			{
-			return $data;
+			throw new \limbo\error ('Module mcrypt is not available! Unable to encrypt the submitted data!');
 			}
 		
-		// Merge settings with defaults
-		$settings = array_merge (array (
-			'algorithm' => MCRYPT_RIJNDAEL_256,
-			'mode'      => MCRYPT_MODE_CBC
-			), $settings);
+		if (empty ($data)) return false;
 		
-		$module 	= mcrypt_module_open ($settings['algorithm'], '', $settings['mode'], '');
-		$ivSize		= mcrypt_enc_get_iv_size ($module);
-		$keySize 	= mcrypt_enc_get_key_size ($module);
-		
-		// Validate IV
-		if (strlen ($iv) > $ivSize)
+		if (empty ($iv))
 			{
-			$iv = substr ($iv, 0, $ivSize);
+			$iv = self::generate_iv ();
 			}
 		
-		// Validate key
-		if (strlen ($key) > $keySize)
+		$module 	= mcrypt_module_open (MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_CBC, '');
+		$size_iv	= mcrypt_enc_get_iv_size ($module);
+		$size_key 	= mcrypt_enc_get_key_size ($module);
+		
+		if (strlen ($iv) > $size_iv)
 			{
-			$key = substr ($key, 0, $keySize);
+			$iv = substr ($iv, 0, $size_iv);
+			}
+		
+		if (strlen ($key) > $size_key)
+			{
+			$key = substr ($key, 0, $size_key);
 			}
 		
 		// Encrypt value
 		mcrypt_generic_init ($module, $key, $iv);
-		$res = @mcrypt_generic ($module, $data);
+		$res = mcrypt_generic ($module, $data);
 		mcrypt_generic_deinit ($module);
 		
-		return $res;
+		return $iv . $res;
 		}
 	
 	/**
@@ -139,47 +138,50 @@ class security
 	 * @param  string $data The encrypted data
 	 * @param  string $key The encryption key
 	 * @param  string $iv The encryption initialization vector
-	 * @param  array  $settings Optional key-value array with custom algorithm and mode
+	 * 
 	 * @return string
+	 * @throws \limbo\error if mcrypt is not loaded
 	 */
-	public static function decrypt ($data, $key, $iv, $settings = array ())
+	public static function decrypt ($data, $key, $iv = '')
 		{
-		if ($data === '' || !extension_loaded ('mcrypt'))
+		if (! extension_loaded ('mcrypt'))
 			{
-			return $data;
+			throw new \limbo\error ('Module mcrypt is not available! Unable to decrypt the submitted data!');
 			}
 		
-		// Merge settings with defaults
-		$settings = array_merge (array (
-			'algorithm' => MCRYPT_RIJNDAEL_256,
-			'mode'      => MCRYPT_MODE_CBC
-			), $settings);
+		if (empty ($data)) return false;
 		
-		$module 	= mcrypt_module_open ($settings['algorithm'], '', $settings['mode'], '');
-		$ivSize 	= mcrypt_enc_get_iv_size ($module);
-		$keySize 	= mcrypt_enc_get_key_size ($module);
+		$module 	= mcrypt_module_open (MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_CBC, '');
+		$size_iv 	= mcrypt_enc_get_iv_size ($module);
 		
-		// Validate IV
-		if (strlen ($iv) > $ivSize)
+		if (empty ($iv))
 			{
-			$iv = substr ($iv, 0, $ivSize);
+			$iv 	= substr ($data, 0, $size_iv);
+			$data	= substr ($data, $size_iv);
 			}
 		
-		// Validate key
-		if (strlen ($key) > $keySize)
-			{
-			$key = substr ($key, 0, $keySize);
-			}
-		
-		// Decrypt value
 		mcrypt_generic_init ($module, $key, $iv);
-		$decryptedData = @mdecrypt_generic ($module, $data);
-		$res = rtrim ($decryptedData, "\0");
+		
+		$dec = mdecrypt_generic ($module, $data);
+		$res = rtrim ($dec, "\0");
+		
 		mcrypt_generic_deinit ($module);
 		
 		return $res;
 		}
 	
+	/**
+	 * Generates a standard 32 char IV for use in the encryption method
+	 * 
+	 * @return string
+	 */
+	public static function generate_iv ()
+		{
+		$size	= mcrypt_get_iv_size (MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CFB);
+		$iv		= mcrypt_create_iv ($size, MCRYPT_DEV_URANDOM);
+		
+		return $iv;
+		}
 	
 	/**
 	 * Hashes the specified string using bcrypt
@@ -245,13 +247,5 @@ class security
 			}
 		
 		return $return;
-		}
-	
-	public static function generate_iv ()
-		{
-		$size	= mcrypt_get_iv_size (MCRYPT_CAST_256, MCRYPT_MODE_CFB);
-		$iv		= mcrypt_create_iv ($size, MCRYPT_DEV_RANDOM);
-		
-		return $iv;
 		}
 	}
