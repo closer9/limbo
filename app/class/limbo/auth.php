@@ -879,10 +879,9 @@ class auth
 			
 			log::debug ('Checking for a valid heartbeat');
 			
-			parse_str (base64_decode ($query), $query);
+			parse_str ('pid=' . base64_decode ($query), $query);
 			
-			$location	= (empty ($query['pid'])) ? 'Unknown' : $query['pid'];
-			$options	= json_encode ($query);
+			$location = array_shift ($query);
 			
 			if ($this->authid > 0)
 				{
@@ -893,10 +892,10 @@ class auth
 					$this->sql->update (session_id (), array (
 						'stamp'		=> time (),
 						'location'	=> $location,
-						'options'	=> $options,
-						), $this->db_heartbeat, 'sessionid');
+						'options'	=> json_encode ($query),
+					), $this->db_heartbeat, 'sessionid');
 					}
-					else
+				else
 					{
 					log::debug ('Creating a new heartbeat record');
 					
@@ -905,11 +904,11 @@ class auth
 						'authid'	=> $this->authid,
 						'stamp'		=> time (),
 						'location'	=> $location,
-						'options'	=> $options,
-						), $this->db_heartbeat);
+						'options'	=> json_encode ($query),
+					), $this->db_heartbeat);
 					}
 				}
-						
+			
 			return true;
 			}
 		

@@ -19,12 +19,10 @@ function heartbeat (string)
 	$.get ('/limbo-heartbeat?query=' + query, function (results) {
 		if (results.status == 0)
 			{
-			var redirect = query.substr (4);
-			
 			clearTimeout (heartbeat_timer);
-			
-			load_popup (path + 'limbo-modal/timeout?message=' + results.message + '&redirect=' + redirect, 'Session expired');
-			
+
+			load_popup (path + 'limbo-modal/timeout?message=' + results.message + '&redirect=' + query, 'Session expired');
+
 			popup_hold ();
 			}
 		
