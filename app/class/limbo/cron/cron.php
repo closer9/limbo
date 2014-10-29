@@ -123,9 +123,9 @@ class cron
 			if (strpos ($this->jobs[$job]['output'], '/') === false)
 				{
 				if ($this->jobs[$job]['output'] === true)
-					$output = config ('path.log') . $job . '.txt';
-					else
-					$output = config ('path.log') . $this->jobs[$job]['output'];
+					$output = config ('path.storage') . 'logs/' . $job . '.txt';
+				else
+					$output = config ('path.storage') . 'logs/' . $this->jobs[$job]['output'];
 				}
 				else
 				{
