@@ -122,7 +122,10 @@ class cron
 			// Are they specifying a file path?
 			if (strpos ($this->jobs[$job]['output'], '/') === false)
 				{
-				$output = config ('path_log') . $this->jobs[$job]['output'];
+				if ($this->jobs[$job]['output'] === true)
+					$output = config ('path.log') . $job . '.txt';
+					else
+					$output = config ('path.log') . $this->jobs[$job]['output'];
 				}
 				else
 				{
@@ -196,17 +199,15 @@ class cron
 	 */
 	public function email ($job, $output)
 		{
-		global $SMTP;
-		
 		if ($this->jobs[$job]['email'])
 			{
 			log::debug ('Sending e-mail of scheduled job results');
 
-			if (! is_object ($SMTP))
-				{
+			if (is_object (\limbo::ioc ('smtp')))
+				$SMTP = \limbo::ioc ('smtp');
+				else
 				$SMTP = new \limbo\util\smtp ();
-				}
-
+			
 			$SMTP->mail (
 				config ('admin.notify'),
 				'Scheduler <' . config ('admin.email') . '>',
