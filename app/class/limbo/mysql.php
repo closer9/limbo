@@ -507,9 +507,12 @@ class mysql
 			
 			else
 				{
-				// If the marker is already quoted, don't add quotes
-				if (preg_match ("#`|'|\"#", @$query[$position - 1]) || preg_match ("#`|'|\"#", @$query[$position + 3]))
+				$marker_before	= (isset ($query[$position - 1])) ? $query[$position - 1] : false;
+				$marker_after	= (isset ($query[$position + 3])) ? $query[$position + 3] : false;
+				
+				if (preg_match ("#`|'|\"#", $marker_before) || preg_match ("#`|'|\"#", $marker_after))
 					{
+					// If there is a quote before or after the marker, don't add quotes
 					$replace = $this->clean ($variable);
 					}
 					else
