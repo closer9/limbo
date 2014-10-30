@@ -111,7 +111,21 @@ if (! function_exists ('hash_verify'))
 		}
 	}
 
-if ( ! function_exists('dd'))
+if (! function_exists ('http'))
+	{
+	function http ()
+		{
+		if (! ($http = config ('web.http')))
+			{
+			$protocol	= (config ('web.ssl')) ? 'https' : 'http';
+			$http		= $protocol . '://' . config ('web.domains')[0] . config ('web.root');
+			}
+		
+		return $http;
+		}
+	}
+
+if (! function_exists('dd'))
 	{
 	function dd ()
 		{
