@@ -66,12 +66,12 @@ class cron
 				{
 				if (lock::get ('scheduler.' . $name))
 					{
-					log::error ('Unable to run scheduled job "' . $name . '". Lock file exists.');
+					log::error ('CRON - Unable to run scheduled job "' . $name . '". Lock file exists.');
 
 					continue;
 					}
 				
-				log::debug ('Spawning scheduled job "' . $name . '"');
+				log::debug ('CRON - Spawning scheduled job "' . $name . '"');
 				
 				exec ("php " . config('path.app') . "/crons/scheduler.php --process=$name &");
 				}
@@ -98,7 +98,7 @@ class cron
 			throw new error ('Unable to run scheduled job "' . $job . '". Lock file exists.');
 			}
 		
-		log::info ('Running scheduled job "' . $job . '"');
+		log::info ('CRON - Running scheduled job "' . $job . '"');
 
 		$this->execute ($job);
 		}
@@ -149,7 +149,7 @@ class cron
 					}
 				catch (\Exception $e)
 					{
-					log::warning ('Scheduled job "' . $job . '" generated an error: ' . $e);
+					log::warning ('CRON - Scheduled job "' . $job . '" generated an error: ' . $e);
 					}
 				
 				// Save off the output to where they specified
@@ -169,15 +169,17 @@ class cron
 				}
 
 			try {
+				log::debug ("CRON - Running | php {$script} {$options} 1> {$output} 2>&1");
+				
 				system ("php $script $options 1> $output 2>&1");
 				}
 			catch (\Exception $e)
 				{
-				log::warning ('Scheduled job "' . $job . '" generated an error: ' . $e);
+				log::warning ('CRON - Scheduled job "' . $job . '" generated an error: ' . $e);
 				}
 			}
 		
-		if (! empty ($this->jobs[$job]['output']))
+		if ($output != '/dev/null' && is_file ($output))
 			{
 			// Do we have output to send via e-mail?
 			$message = file_get_contents ($output);
@@ -201,14 +203,11 @@ class cron
 		{
 		if ($this->jobs[$job]['email'])
 			{
-			log::debug ('Sending e-mail of scheduled job results');
-
-			if (is_object (\limbo::ioc ('smtp')))
-				$SMTP = \limbo::ioc ('smtp');
-				else
-				$SMTP = new \limbo\util\smtp ();
+			log::debug ('CRON - Sending e-mail of scheduled job results');
 			
-			$SMTP->mail (
+			$smtp = new \limbo\util\smtp ();
+			
+			$smtp->mail (
 				config ('admin.notify'),
 				'Scheduler <' . config ('admin.email') . '>',
 				'Scheduler output for job "' . $job . '"',
