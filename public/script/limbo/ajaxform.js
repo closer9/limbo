@@ -43,10 +43,10 @@
 			element = $(this);
 			
 			/* Check to see if there are file inputs here */
-			var file_inputs	= $('input:file:enabled[value]', options.form);
+			var file_inputs	= $('input:file:enabled', options.form);
 			
 			/* Lets clean up the form a little bit */
-			element.attr ('action', element.attr ('action') + '&ajax'),
+			element.attr ('action', element.attr ('action') + '&ajax');
 			
 			element.submit (function (event)
 				{
@@ -92,7 +92,7 @@
 			/* Clean out the iframe contents */
 			setTimeout (function () { response.html (''); }, 1);
 			});
-		}
+		};
 	
 	$.fn.ajaxform.submit_ajax = function (options, element)
 		{
@@ -112,7 +112,7 @@
 			error: function (request, status, error)
 				{ alert ('Ajax submit failed: ' + request.responseText + ' - ' + status + ' - ' + error); }
 			});
-		}
+		};
 	
 	$.fn.ajaxform.process = function (options, response)
 		{
@@ -174,5 +174,5 @@
 				alert ('Unknown code returned from ajax request');
 				break;
 			}
-		}
+		};
 	})(jQuery);
