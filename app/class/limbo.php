@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1145';
+	public static $version	= '0.1.5.1146';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -74,6 +74,8 @@ class limbo
 	 * web_init() method. Otherwise our job here of booting the app is done.
 	 *
 	 * If this is from a CLI call then the rest of the processing is done there.
+	 * 
+	 * @param bool $bootstrap_only Do not process the page, just perform the startup steps
 	 */
 	public function __construct ($bootstrap_only = false)
 		{
@@ -162,6 +164,8 @@ class limbo
 	
 	/**
 	 * This is the main processing unit of the application for web requests.
+	 * 
+	 * @param bool $bootstrap_only Do not process the page, just perform the startup steps
 	 */
 	public function web_init ($bootstrap_only = false)
 		{
