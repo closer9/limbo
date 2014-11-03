@@ -43,6 +43,7 @@ class request
 	// HTTP Variables
 	public $get;			// Collection of _GET variables
 	public $post;			// Collection of _POST variables
+	public $request;		// Collection of _GET and _POST variables
 	public $cookies;		// Collection of _COOKIE variables
 	public $files;			// Collection of _FILES variables
 	
@@ -105,6 +106,7 @@ class request
 		// Set the request variables
 		$this->get 		= new collection ($_GET);
 		$this->post 	= new collection ($_POST);
+		$this->request 	= new collection (array_merge ($_GET, $_POST));
 		$this->cookies 	= new collection ($_COOKIE);
 		$this->files 	= new collection ($_FILES);
 		
