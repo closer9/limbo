@@ -292,7 +292,10 @@ class mysql
 		{
 		if (! empty ($input));
 			{
-			$input = stripslashes ($input);
+			if (strpos ('\\', $input) !== false)
+				{
+				$input = stripslashes ($input);
+				}
 			
 			// Try to clean up any windows style newlines
 			$input = preg_replace ("/\\\\r\\\\n/", "\r\n", $input);
@@ -328,8 +331,12 @@ class mysql
 			{
 			return 'NULL';
 			}
+		elseif (is_string ($input))
+			{
+			return "'{$input}'";
+			}
 		
-		return "'{$input}'";
+		return $input;
 		}
 	
 	/**
@@ -425,7 +432,7 @@ class mysql
 	 * @param string $query		The query to execute
 	 * @param bool $save		Save the result set internally as well as return it
 	 *
-	 * @return bool|\mysqli_result	True on unsaveable queries / result set on all others
+	 * @return bool|\mysqli_result	True on un-savable queries / result set on all others
 	 * @throws error				If no connection is available
 	 */
 	public function query ($query, $save = true)
@@ -437,21 +444,14 @@ class mysql
 			throw new error ('No MySQL connection available');
 			}
 		
-		$this->mysql->real_query ($query);
+		$result = $this->mysql->query ($query);
 		
-		if ($this->mysql->field_count)
+		if ($save)
 			{
-			$result = $this->mysql->store_result ();
-			
-			if ($save)
-				{
-				$this->sql_result = $result;
-				}
-			
-			return $result;
+			$this->sql_result = $result;
 			}
 		
-		return true;
+		return $result;
 		}
 	
 	/**
@@ -860,7 +860,7 @@ class mysql
 			$add_where[] = "`{$key}` = {$value}";
 			}
 		
-		// Join all the update and where options together
+		// Join the update and where options together
 		$update = implode (", ", $add_update);
 		$where = implode (' AND ', $add_where);
 		
