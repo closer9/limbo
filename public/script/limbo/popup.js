@@ -111,6 +111,16 @@ function popup_fetch ()
 
 function popup_content (content)
 	{
+	try
+		{
+		var title = $(content).filter('title')[0].text;
+
+		if (title != '')
+			{
+			$('#popup-title').html(title);
+			}
+		} catch (e) {}
+	
 	/* If a popup already exists change the contents */
 	if (popup_status == 1)
 		{
