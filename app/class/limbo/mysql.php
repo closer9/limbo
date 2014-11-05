@@ -313,7 +313,7 @@ class mysql
 	 */
 	public function clean_value ($input)
 		{
-		$input = $this->clean ($input);
+		log::debug ("MYSQL - Cleaning input: {$input} [" . gettype ($input) . "]");
 		
 		switch (gettype ($input))
 			{
@@ -327,13 +327,13 @@ class mysql
 				return (float) $input;
 			
 			case 'string':
-				return "'{$input}'";
+				return "'" . $this->clean ($input) . "'";
 			
 			case 'NULL':
 				return 'NULL';
 			
 			default:
-				return $input;
+				return $this->clean ($input);
 			}
 		}
 	
