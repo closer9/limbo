@@ -315,28 +315,26 @@ class mysql
 		{
 		$input = $this->clean ($input);
 		
-		if (is_bool ($input))
+		switch (gettype ($input))
 			{
-			return ($input) ? 'TRUE' : 'FALSE';
+			case 'boolean':
+				return ($input) ? 'TRUE' : 'FALSE';
+			
+			case 'integer':
+				return (int) $input;
+			
+			case 'double':
+				return (float) $input;
+			
+			case 'string':
+				return "'{$input}'";
+			
+			case 'NULL':
+				return 'NULL';
+			
+			default:
+				return $input;
 			}
-		elseif (is_int ($input))
-			{
-			return (int) $input;
-			}
-		elseif (is_float ($input))
-			{
-			return (float) $input;
-			}
-		elseif (is_null ($input))
-			{
-			return 'NULL';
-			}
-		elseif (is_string ($input))
-			{
-			return "'{$input}'";
-			}
-		
-		return $input;
 		}
 	
 	/**
