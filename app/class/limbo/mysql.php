@@ -442,7 +442,10 @@ class mysql
 			throw new error ('No MySQL connection available');
 			}
 		
-		$this->mysql->real_query ($query);
+		if (! $this->mysql->real_query ($query))
+			{
+			throw new error ("MySQL failed: {$this->mysqli->error} <br> {$query}");
+			}
 		
 		if ($this->mysql->field_count)
 			{
@@ -480,7 +483,7 @@ class mysql
 	 * @return bool|\mysqli_result
 	 * @throws error
 	 */
-	public function prepare ($query, $variables = array (), $save = true)
+	public function prepare ($query, array $variables = array (), $save = true)
 		{
 		$query = preg_replace ('/\?/', '%?%', $query);
 		
@@ -543,9 +546,9 @@ class mysql
 	 *
 	 * @return array|bool|mixed
 	 */
-	public function prefetch ($query, $variables = array (), $assoc = true)
+	public function prefetch ($query, array $variables = array (), $assoc = true)
 		{
-		if ($result = $this->prepare ($query, $variables))
+		if ($result = $this->prepare ($query, $variables, false))
 			{
 			return $this->fetch_result ($result, $assoc);
 			}
