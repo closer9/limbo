@@ -442,14 +442,21 @@ class mysql
 			throw new error ('No MySQL connection available');
 			}
 		
-		$result = $this->mysql->query ($query);
+		$this->mysql->real_query ($query);
 		
-		if ($save)
+		if ($this->mysql->field_count)
 			{
-			$this->sql_result = $result;
+			$result = $this->mysql->store_result ();
+			
+			if ($save)
+				{
+				$this->sql_result = $result;
+				}
+			
+			return $result;
 			}
 		
-		return $result;
+		return true;
 		}
 	
 	/**
@@ -468,11 +475,12 @@ class mysql
 	 * 
 	 * @param string $query		The query you want to execute
 	 * @param array $variables	The list of variables you are injecting
+	 * @param bool $save		Save the mysql result inside the object
 	 *
 	 * @return bool|\mysqli_result
 	 * @throws error
 	 */
-	public function prepare ($query, $variables = array ())
+	public function prepare ($query, $variables = array (), $save = true)
 		{
 		$query = preg_replace ('/\?/', '%?%', $query);
 		
@@ -523,7 +531,7 @@ class mysql
 			$query = substr_replace ($query, $replace, $position, 3);
 			}
 		
-		return $this->query ($query);
+		return $this->query ($query, $save);
 		}
 	
 	/**
@@ -777,7 +785,7 @@ class mysql
 		
 		$result = $this->prepare ("SELECT * FROM `?` WHERE " . implode (" AND ", $search), array (
 			((empty ($table)) ? $this->sql_table : $table),
-			));
+			), false);
 		
 		if ($this->num_rows (null, $result) > 0)
 			{

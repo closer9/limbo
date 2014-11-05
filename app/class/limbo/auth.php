@@ -663,7 +663,7 @@ class auth
 		$result = $this->sql->prepare ("SELECT * FROM `?` WHERE `sessionid` = ?", array (
 			$this->db_sessions,
 			session_id ()
-			));
+			), false);
 		
 		if ($this->sql->num_rows (null, $result))
 			{
@@ -733,7 +733,7 @@ class auth
 				$result = $this->sql->prepare ("SELECT * FROM `?` WHERE `authid` = ?", array (
 					$this->db_sessions,
 					$this->authid
-					));
+					), false);
 				
 				if (($count = $this->sql->num_rows (null, $result)))
 					{
@@ -1357,7 +1357,7 @@ class auth
 			$result = $this->sql->prepare ("SELECT * FROM `?` WHERE `keyname` REGEXP '^?'", array (
 				$this->db_blocked,
 				$keyname
-				));
+				), false);
 			
 			if ($this->sql->num_rows (null, $result))
 				{
@@ -1506,7 +1506,7 @@ class auth
 					$this->db_users,
 					$authid,
 					$username,
-					));
+					), false);
 				
 				if ($this->sql->num_rows (null, $result) > 0)
 					{
