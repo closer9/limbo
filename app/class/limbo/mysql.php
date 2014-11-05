@@ -290,9 +290,9 @@ class mysql
 	 */
 	public function clean ($input)
 		{
-		if (! empty ($input));
+		if (! empty ($input))
 			{
-			if (strpos ('\\', $input) !== false)
+			if (strpos ($input, '\\') !== false)
 				{
 				$input = stripslashes ($input);
 				}
