@@ -17,7 +17,7 @@ function javascript_init ()
 	$('table.list tr:nth-child(even)').removeClass ('stripe');
 
 	/* Make the popup-box movable */
-	$('#popup-box').draggable ({handle: '#popup-move'});
+	$('#popup-box').draggable ({handle: '#popup-title'});
 	
 	if (jQuery().tooltip)
 		{

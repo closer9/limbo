@@ -267,10 +267,10 @@ ol.alpha	{ list-style-type: upper-alpha !important; }
 /*********************************/
 #popup-background	{ background: #000000; position: fixed; top: 0; left: 0; z-index: 999; }
 #popup-box			{ background: #fbfbfb; max-width: 900px; min-width: 300px; position: fixed; z-index: 1000; box-shadow: 3px 4px 5px #333; }
-#popup-title		{ margin-left: 6px; margin-top: 5px; font-weight: bold; font-size: 1.1em; }
+#popup-header		{ border-bottom: 1px solid #c9c9c9; background-color: #e5e5e5; border-top-right-radius: 4px; border-top-left-radius: 4px; }
+#popup-title		{ margin-left: 6px; padding-top: 5px; font-weight: bold; font-size: 1.1em; height: 20px; }
 #popup-content		{ margin: 10px; }
 #popup-buttons		{ position: absolute; top: 5px; right: 6px; padding: 0px 2px; }
-#popup-move			{ float: right; margin-left: 6px; }
 #popup-close		{ float: right; margin-left: 6px; }
 #popup-loading      { position: fixed; left: 50%; margin-top: 150px; margin-left: -32px; }
 

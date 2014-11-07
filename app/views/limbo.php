@@ -67,7 +67,6 @@
 			<div id="popup-title"></div>
 			<div id="popup-buttons">
 				<div id="popup-close" class="hand"><img src="<?php echo $root?>images/icons/menu_close.png" class="icon14" /></div>
-				<div id="popup-move" class="move"><img src="<?php echo $root?>images/icons/menu_move.png" class="icon14" /></div>
 			</div>
 		</div>
 		
