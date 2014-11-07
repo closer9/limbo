@@ -1092,19 +1092,19 @@ class auth
 	 * @param int   $authid		The authid of the account to update
 	 * @param array $settings	An array of settings to apply (in key => value format)
 	 */
-	public function user_update_settings ($authid, $settings)
+	public function user_update_settings ($authid, array $settings)
 		{
 		if ($this->db_settings)
 			{
-			$record = $this->sql->select (array ('authid' => $authid), $this->db_settings);
+			$record = $this->sql->select (array ('authid' => (int) $authid), $this->db_settings);
 			
-			if (! isset ($record['authid']))
+			if (isset ($record['authid']))
 				{
-				$this->sql->update ($authid, $settings, $this->db_settings, 'authid');
+				$this->sql->update ((int) $authid, $settings, $this->db_settings, 'authid');
 				}
 				else
 				{
-				$this->sql->insert (array_merge ($settings, array ('authid' => $authid)), $this->db_settings, 'authid');
+				$this->sql->insert (array_merge ($settings, array ('authid' => (int) $authid)), $this->db_settings, 'authid');
 				}
 			}
 		}
