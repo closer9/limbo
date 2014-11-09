@@ -15,8 +15,8 @@ function heartbeat_init ()
 
 function heartbeat (string)
 	{
-	var query	= (string != undefined) ? string : query;
-	var active	= (heartbeat_active) ? '&active=true' : '';
+	var active = (heartbeat_active) ? '&active=true' : '';
+	query = (string != undefined) ? string : query;
 	
 	$.get ('/limbo-heartbeat?query=' + query + active, function (results) {
 		if (results.status == 0)
