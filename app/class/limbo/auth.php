@@ -865,10 +865,11 @@ class auth
 	 * Records heartbeat activity from the website into the database.
 	 * 
 	 * @param string $query The website information to record (PID, etc.)
+	 * @param bool $active	Did the last heartbeat have user activity (typing, moving the mouse)
 	 *
 	 * @return bool
 	 */
-	public function heartbeat ($query)
+	public function heartbeat ($query, $active = false)
 		{
 		if ($this->session_check ())
 			{
@@ -885,6 +886,11 @@ class auth
 			
 			if ($this->authid > 0)
 				{
+				if ($active)
+					{
+					$this->session_verify ();
+					}
+				
 				if ($this->sql->id (session_id (), $this->db_heartbeat, 'sessionid'))
 					{
 					log::debug ('Updating an existing heartbeat record');

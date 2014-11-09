@@ -4,6 +4,7 @@
  */
 
 var heartbeat_timer;
+var heartbeat_active = true;
 
 function heartbeat_init ()
 	{
@@ -14,9 +15,10 @@ function heartbeat_init ()
 
 function heartbeat (string)
 	{
-	query = (string != undefined) ? string : query;
+	var query	= (string != undefined) ? string : query;
+	var active	= (heartbeat_active) ? '&active=true' : '';
 	
-	$.get ('/limbo-heartbeat?query=' + query, function (results) {
+	$.get ('/limbo-heartbeat?query=' + query + active, function (results) {
 		if (results.status == 0)
 			{
 			clearTimeout (heartbeat_timer);
@@ -28,4 +30,6 @@ function heartbeat (string)
 		
 		$('#heartbeat-status').html (results.status);
 		});
+
+	heartbeat_active = false;
 	}

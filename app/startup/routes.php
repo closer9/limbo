@@ -18,10 +18,13 @@ limbo::router ()->build ('/limbo-heartbeat', function () {
 	
 	if (is_object ($auth))
 		{
-		limbo\log::debug ('Heartbeat (' . limbo::ioc ('request')->ip . '): ' . @base64_decode ($_REQUEST['query']));
+		$query	= (isset ($_REQUEST['query'])) ? $_REQUEST['query'] : '';
+		$active = (isset ($_REQUEST['active'])) ? true : false;
+		
+		limbo\log::debug ('Heartbeat (' . limbo::ioc ('request')->ip . '): ' . @base64_decode ($query));
 		
 		limbo::json (array (
-			'status'  => ($auth->heartbeat (@$_REQUEST['query'])) ? time () : 0,
+			'status'  => ($auth->heartbeat ($query, $active)) ? time () : 0,
 			'message' => $auth->errormsg
 			));
 		}

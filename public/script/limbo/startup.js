@@ -84,6 +84,10 @@ function javascript_init ()
 			}
 		});
 	
+	// If any user movement is noticed, mark this heartbeat as active
+	$(this).mousemove (function () { heartbeat_active = true; });
+	$(this).keypress (function () { heartbeat_active = true; });
+	
 	// Allow for a custom init function
 	if (typeof custom_init == 'function')
 		{
