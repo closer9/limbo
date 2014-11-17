@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1149';
+	public static $version	= '0.1.5.1150';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -605,12 +605,13 @@ class limbo
 	 */
 	public static function error_handler ($number, $string = '', $file = '', $line = '')
 		{
-		log::error ("{$string} ({$file} [{$line}])");
-		
-		if (! ($number & error_reporting ()))
+		// Don't report any errors if this error is suppressed
+		if (error_reporting () === 0 || ! ($number & error_reporting ()))
 			{
 			return;
 			}
+		
+		log::error ("{$string} ({$file} [{$line}])");
 		
 		if ($number & (E_NOTICE + E_WARNING + E_USER_NOTICE + E_USER_WARNING + E_USER_ERROR))
 			{
