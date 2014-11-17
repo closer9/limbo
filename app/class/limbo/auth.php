@@ -253,7 +253,7 @@ class auth
 	 */
 	private function record_error ($message)
 		{
-		log::error ('Auth error: ' . $message);
+		log::warning ('Auth error: ' . $message);
 		
 		$this->errormsg = $message;
 		
