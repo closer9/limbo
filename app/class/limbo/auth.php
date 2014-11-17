@@ -1081,7 +1081,7 @@ class auth
 			{
 			$record = $this->sql->select (array ('authid' => $authid), $this->db_info);
 			
-			if (! isset ($record['authid']))
+			if (isset ($record['authid']))
 				{
 				$this->sql->update ($authid, $info, $this->db_info, 'authid');
 				}
