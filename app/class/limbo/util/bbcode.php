@@ -72,7 +72,7 @@ class bbcode
 			
 			if (stripos ($content, $keyword) !== false)
 				{
-				$content = preg_replace ('/(' . preg_quote ($keyword) . ')/i', '<span class="' . $class . '">$1</span>', $content);
+				$content = preg_replace ('/(' . preg_quote ($keyword) . ')(?![^\[]*(\[\/url]|"]|\[\/img]))/i', '<span class="' . $class . '">$1</span>', $content);
 				}
 			}
 		
