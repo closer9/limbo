@@ -164,6 +164,7 @@
 			type: 'get',
 			url: $.fn.pagination.settings['query'] + '&ajax',
 			dataType: 'html',
+			cache: false,
 			data: {
 				ajax:	'',
 				colms:	$.fn.pagination.settings['colms'],
