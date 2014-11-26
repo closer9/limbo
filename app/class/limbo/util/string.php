@@ -35,22 +35,39 @@ class string
 	 * 
 	 * @param string $string		The string to append/update
 	 * @param string $separator		The seperator used before the number
-	 * @param int    $start			Where to start counting
+	 * @param int $start			Where to start counting
+	 * @param bool $extension		Check for a file extension and move of the separator
 	 *
 	 * @return string
 	 */
-	static function increment ($string, $separator = '-', $start = 1)
+	static function increment ($string, $separator = '-', $start = 1, $extension = false)
 		{
+		if ($extension)
+			{
+			if (($last = strrpos ($string, '.', 5)) !== false)
+				{
+				$ext	= substr ($string, $last + 1);
+				$string = substr ($string, 0, $last);
+				}
+			}
+		
 		preg_match ('/(.+)' . $separator . '([0-9]+)$/', $string, $match);
 		
 		if (isset ($match[2]))
 			{
-			return $match[1] . $separator . ($match[2] + 1);
+			$output = $match[1] . $separator . ($match[2] + 1);
 			}
 			else
 			{
-			return $string . $separator . $start;
+			$output = $string . $separator . $start;
 			}
+		
+		if ($extension && ! empty ($ext))
+			{
+			$output .= ".{$ext}";
+			}
+		
+		return $output;
 		}
 	
 	/**

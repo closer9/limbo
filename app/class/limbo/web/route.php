@@ -103,13 +103,13 @@ class route
 			}
 		
 		// Start building the regular expression. Thanks Mike Cao!
-		$ids	= array ();
+		$params	= array ();
 		$regex	= str_replace (array (')','/*'), array (')?','(/?|/.*?)'), $this->pattern);
 		$regex	= preg_replace_callback (
 			'#@([\w]+)(:([^/\(\)]*))?#',
-			function ($matches) use (&$ids)
+			function ($matches) use (&$params)
 				{
-				$ids[$matches[1]] = null;
+				$params[] = $matches[1];
 				
 				if (isset($matches[3]))
 					{
@@ -118,18 +118,18 @@ class route
 				
 				return '(?P<' . $matches[1] . '>[^/\?]+)';
 				}, $regex);
-
+		
 		// Make sure we're ending the pattern with the proper slash
 		$regex .= (substr ($this->pattern, -1) === '/') ? '?' : '/?';
-
+		
 		// If the route matches then build the parameter list
 		if (preg_match ('#^' . $regex . '(?:\?.*)?$#i', $url, $matches))
 			{
-			foreach ($ids as $k => $v)
+			foreach ($params as $id)
 				{
-				$this->params[$k] = (array_key_exists ($k, $matches)) ? urldecode ($matches[$k]) : null;
+				$this->params[$id] = (array_key_exists ($id, $matches)) ? urldecode ($matches[$id]) : null;
 				}
-
+			
 			if ($this->pass)
 				{
 				$this->params[] = $this;
@@ -137,7 +137,7 @@ class route
 			
 			// Save the build expression for later
 			$this->regex = $regex;
-
+			
 			return true;
 			}
 		

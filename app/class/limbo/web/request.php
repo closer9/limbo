@@ -159,7 +159,7 @@ class request
 	 */
 	private static function get_pid ()
 		{
-		$pid = '/' . ((empty ($_REQUEST['pid'])) ? '' : filter_var ($_REQUEST['pid'], FILTER_SANITIZE_URL));
+		$pid = '/' . ((empty ($_REQUEST['pid'])) ? '' : $_REQUEST['pid']);
 		$pid = preg_replace ('/\;|\s\s+|\*|\.php$/', '', $pid);
 		$pid = (substr ($pid, -1) == '/') ? $pid . 'index' : $pid;
 		

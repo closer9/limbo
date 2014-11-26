@@ -13,6 +13,10 @@ limbo::router ()->build ('/limbo-modal(/@template)', function ($template) {
 	limbo::render ("modals/{$template}");
 	});
 
+limbo::router ()->build ('/limbo-storage/@app/@file', function ($app, $file) {
+	limbo\util\storage::download ($app, $file);
+	});
+
 limbo::router ()->build ('/limbo-heartbeat', function () {
 	$auth = limbo::ioc ('auth');
 	

@@ -29,6 +29,30 @@ class file
 		}
 	
 	/**
+	 * Gets the size and mime type of the supplied file
+	 * 
+	 * @param string $file The full path + name of the file
+	 *
+	 * @return bool if the file can't be found
+	 */
+	public static function info ($file)
+		{
+		if (! is_file ($file))
+			{
+			\limbo\log::debug ('Could not find file ' . $file);
+			
+			return false;
+			}
+		
+		$info = new \finfo (FILEINFO_MIME_TYPE);
+		
+		$output['mime'] = $info->file ($file);
+		$output['size'] = filesize ($file);
+			
+		return $output;
+		}
+	
+	/**
 	 * Traverses a directory returning all the files in that directory (recursively or not)
 	 * 
 	 * @param string $directory		The directory path to look at
