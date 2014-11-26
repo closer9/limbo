@@ -1,7 +1,6 @@
 .idea
 
 /app/crons/**
-/app/storage/**
 /app/configs/*.config.php
 
 !/app/crons/scheduler.php
