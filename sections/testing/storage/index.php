@@ -33,7 +33,7 @@ if (limbo::request ()->method == 'POST')
 	<?php
 	foreach (limbo\util\file::filelist (config ('path.storage') . "files/test/", false) as $file)
 		{
-		$file = substr ($file, 6);
+		$file = substr ($file, strrpos ($file, '/') + 1);
 		
 		echo '<li><a href="' . $root . 'limbo-storage/test/' . $file . '">' . $file . '</a></li>';
 		}

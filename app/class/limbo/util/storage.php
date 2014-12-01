@@ -43,7 +43,7 @@ class storage
 							log::debug ("STORAGE - Saved {$files['name'][$key]} for {$app}");
 							
 							$output[] = array (
-								'path' => self::path ($app, $files['name'][$key]),
+								'path' => self::path ($app, $files['name'][$key], false),
 								'name' => $filename,
 								'mime' => $files['type'][$key],
 								'size' => $files['size'][$key],
@@ -66,7 +66,7 @@ class storage
 							log::debug ("STORAGE - Saved {$files['name']} for {$app}");
 							
 							$output[] = array (
-								'path' => self::path ($app, $files['name']),
+								'path' => self::path ($app, $files['name'], false),
 								'name' => $filename,
 								'mime' => $files['type'],
 								'size' => $files['size'],
@@ -95,6 +95,38 @@ class storage
 		if (self::file_verify ($app, $file))
 			{
 			return file_get_contents (self::path ($app, $file, true));
+			}
+		
+		return false;
+		}
+	
+	/**
+	 * Remove a file from storage.
+	 *
+	 * @param string $app	The name of the storage group
+	 * @param string $file	The name of the file
+	 *
+	 * @return bool true on success, false on failure
+	 * @throws error if we can't delete the file
+	 */
+	public static function remove ($app, $file)
+		{
+		log::debug ("STORAGE - Removing {$file} for {$app}");
+		
+		if (self::file_verify ($app, $file))
+			{
+			try {
+				unlink (self::path ($app, $file, true));
+				}
+			catch (\Exception $e)
+				{
+				throw new error ("Unable to delete file {$file} for {$app}");
+				}
+			
+			if (! self::file_verify ($app, $file))
+				{
+				return true;
+				}
 			}
 		
 		return false;

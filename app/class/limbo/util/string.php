@@ -44,7 +44,7 @@ class string
 		{
 		if ($extension)
 			{
-			if (($last = strrpos ($string, '.', 5)) !== false)
+			if (strlen ($string) >= 5 && ($last = strrpos ($string, '.', 5)) !== false)
 				{
 				$ext	= substr ($string, $last + 1);
 				$string = substr ($string, 0, $last);
