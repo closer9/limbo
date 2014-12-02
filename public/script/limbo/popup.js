@@ -51,6 +51,7 @@ function load_popup (location, title, target, type)
 		}
 		else
 		{
+		popup_loading ();
 		popup_fetch();
 		}
 	}
@@ -124,7 +125,7 @@ function popup_content (content)
 	/* If a popup already exists change the contents */
 	if (popup_status == 1)
 		{
-		popup_close ();
+		//popup_close ();
 		
 		$('#popup-content').fadeTo (100, 0, function () {
 			$(this).html (content);
@@ -153,6 +154,7 @@ function post_processing ()
 	$('#popup-content #crumbs').remove ();
 	$('#popup-content .focus').focus ();
 	$('#popup-close').click (function () { disable_popup (); });
+	$("body").addClass("popup-open");
 	
 	javascript_init ();
 	center_popup ();
@@ -190,6 +192,8 @@ function disable_popup ()
 
 function popup_loading ()
 	{
+	$('#' + popup_target).fadeOut ('fast');
+	
 	$('#popup-loading').fadeIn (1000);
 	}
 
@@ -210,6 +214,8 @@ function popup_release ()
 function popup_close ()
 	{
 	$('#' + popup_target).fadeOut ('fast');
+
+	$("body").removeClass("popup-open");
 	
 	popup_status = 0;
 	}

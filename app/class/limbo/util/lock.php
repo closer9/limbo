@@ -49,10 +49,10 @@ class lock
 			config ('path.storage') . '/locks/' . $lock . '.lock',
 			implode (PHP_EOL, array (
 				'@Created:' . date ('Y-m-d H:i:s'),
-				'@Expires:'	. ($expires == 0) ? 'Never' : date ('Y-m-d H:i:s', time () + $expires),
+				'@Expires:'	. (($expires == 0) ? 'Never' : date ('Y-m-d H:i:s', time () + $expires)),
 				$data
-			))
-		);
+				))
+			);
 		
 		log::debug ("Created lock file named '{$lock}'");
 		}

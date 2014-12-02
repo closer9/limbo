@@ -274,6 +274,10 @@ ol.alpha	{ list-style-type: upper-alpha !important; }
 #popup-close		{ float: right; margin-left: 6px; }
 #popup-loading      { position: fixed; left: 50%; margin-top: 150px; margin-left: -32px; }
 
+body.popup-open {
+	overflow: hidden;
+	}
+
 /* Pagination styles */
 /*********************/
 .pag-button { background-color: #f0f0f0; border: 1px solid #9b9b9b; margin-right: 12px; padding: 1px 4px; opacity: 0.5; line-height: 16px; }
