@@ -59,7 +59,13 @@ class cron
 			{
 			if (! $settings['enabled'])
 				continue;
-
+			
+			if (config ('limbo.production') && $settings['production'] === false)
+				continue;
+			
+			if (! config ('limbo.production') && $settings['production'] === true)
+				continue;
+			
 			$schedule = expr\CronExpression::factory ($settings['schedule']);
 
 			if ($schedule->isDue ())
@@ -234,6 +240,7 @@ class cron
 	 * output      null        No           A filename to save the output to
 	 * enabled     true        No           Specifies if the job will run or not
 	 * email       false       No           E-mail the output (must save to a file)
+	 * production  'both'      No           Runs on production or not or both
 	 *
 	 * - You must specify either a command or a script (or both)
 	 * 
@@ -266,13 +273,14 @@ class cron
 		
 		// Setup the defaults
 		$this->jobs[$name] = array (
-			'command'	=> null,
-			'script'	=> null,
-			'options'	=> '',
-			'schedule'	=> null,
-			'output'	=> null,
-			'enabled'	=> true,
-			'email'		=> false,
+			'command'	 => null,
+			'script'	 => null,
+			'options'	 => '',
+			'schedule'	 => null,
+			'output'	 => null,
+			'enabled'	 => true,
+			'email'		 => false,
+			'production' => 'both'
 			);
 		
 		// And now overwrite the defaults
