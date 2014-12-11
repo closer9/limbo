@@ -3,7 +3,7 @@
 <br />
 
 <div class="box-light">
-	<div class="textc bold m10 red" style="font-size: 1.4em;"><?php echo $message?></div>
+	<div id="limbo-error-message" class="textc bold m10 red" style="font-size: 1.4em;"><?php echo $message?></div>
 </div>
 
 <br />

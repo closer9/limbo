@@ -102,15 +102,24 @@
 			type:		element.attr ('method'),
 			url:		element.attr ('action'),
 			dataType:	'text',
-			
+
 			success: function (response)
 				{
 				/* Process the results from the AJAX call */
 				$.fn.ajaxform.process (options, response);
 				},
-			
+
 			error: function (request, status, error)
-				{ alert ('Ajax submit failed: ' + request.responseText + ' - ' + status + ' - ' + error); }
+				{
+				console.log (request.responseText);
+
+				if (request.responseText.indexOf ("limbo-error-message") >= 0)
+					{
+					error = $(request.responseText).find ("#limbo-error-message").text ();
+					}
+
+				alert ('Error: ' + error);
+				}
 			});
 		};
 	
