@@ -243,7 +243,7 @@ class storage
 			\limbo::response()
 				->header ('Content-Type', $type)
 				->header ('Content-Lenth', $size)
-				->header ('Content-Disposition', "{$mode}; filename='{$file}'")
+				->header ('Content-Disposition', "{$mode}; filename=\"{$file}\"")
 				->cache (false)
 				->write (self::get ($app, $file))
 				->send ();
