@@ -36,7 +36,7 @@ function javascript_init ()
 	
 	if (jQuery().timepicker)
 		{
-		$('.timebox').timepicker({ampm: true, stepMinute: 15});
+		$('.timebox').timepicker({ampm: true, step: 15});
 		}
 
 	if (jQuery().pagination)
