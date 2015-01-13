@@ -815,10 +815,9 @@ class mysql
 		
 		foreach ($input as $key => $value)
 			{
-			$key 	= $this->clean ($key);
-			$value 	= $this->clean ($value);
+			$key = $this->clean ($key);
 			
-			$add_key[] 		= "`{$key}`";
+			$add_key[] 	= "`{$key}`";
 			$add_value[] 	= $this->clean_value ($value);
 			}
 		
