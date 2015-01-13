@@ -350,7 +350,7 @@ class response
 		
 		if (($length = strlen ($this->body)) > 0)
 			{
-			header("Content-Length: {$length}");
+			header ("Content-Length: {$length}");
 			}
 		
 		foreach (headers_list () as $header)
