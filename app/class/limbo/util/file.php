@@ -107,6 +107,32 @@ class file
 		}
 	
 	/**
+	 * Recursively deletes a directory and anything it contains.
+	 *
+	 * @param string $directory The directory to delete
+	 *
+	 * @return bool
+	 */
+	public static function delete_tree ($directory)
+		{
+		$files = array_diff (scandir ($directory), array ('.', '..'));
+		
+		foreach ($files as $file)
+			{
+			if (is_dir ("{$directory}/{$file}"))
+				{
+				self::delete_tree ("{$directory}/{$file}");
+				}
+			else
+				{
+				unlink ("{$directory}/{$file}");
+				}
+			}
+		
+		return rmdir ($directory);
+		}
+	
+	/**
 	 * Includes a file with the added benefit of extracting all our globals to it. Very useful
 	 * if we want our global variables to be present in all included files.
 	 * 
