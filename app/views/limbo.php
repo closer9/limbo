@@ -42,6 +42,13 @@
 				{
 				heartbeat_init ();
 				}
+			
+			<?php
+			if (! empty (limbo::request()->request['popup']))
+				{
+				echo 'load_popup ("' . base64_decode (limbo::request()->request['popup']) . '");';
+				}
+ 			?>
 			});
 		// ]]>
 	</script>
