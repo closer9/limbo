@@ -21,7 +21,7 @@ function javascript_init ()
 	
 	if (jQuery().tooltip)
 		{
-		$('.tooltip').tooltip({relative: true, position: 'center right', predelay: 200});
+		$('.tooltip').tooltip ({position: {my: "left+5 top+5", at: "left bottom", collision: "flipfit"}});
 		}
 
 	if (jQuery().datetimepicker)
