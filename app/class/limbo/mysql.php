@@ -290,18 +290,17 @@ class mysql
 	 */
 	public function clean ($input)
 		{
-		if (! empty ($input))
+		if (is_string ($input))
 			{
-			if (strpos ($input, '\\') !== false)
+			if (!empty ($input))
 				{
-				$input = stripslashes ($input);
+				$input = preg_replace ("/\\\\r\\\\n/", "\r\n", $input);
 				}
 			
-			// Try to clean up any windows style newlines
-			$input = preg_replace ("/\\\\r\\\\n/", "\r\n", $input);
+			return $this->mysql->real_escape_string ($input);
 			}
 		
-		return $this->mysql->real_escape_string ($input);
+		return $input;
 		}
 	
 	/**
@@ -981,12 +980,12 @@ class mysql
 			{
 			foreach ($insert as $key => $value)
 				{
-				$array[$this->clean ($key)] = $this->clean_value ($value);
+				$array[$this->clean ($key)] = $this->clean ($value);
 				}
 			}
 			else
 			{
-			$insert = $this->clean_value ($insert);
+			$insert = $this->clean ($insert);
 			
 			if (array_search ($insert, $array) === false)
 				{
