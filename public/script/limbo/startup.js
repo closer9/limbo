@@ -77,7 +77,7 @@ function javascript_init ()
 	$('#popup-background').click (function () { disable_popup (); });
 
 	/* Look for the escape key to close the popup */
-	$(document).keypress (function (e) {
+	$(document).keyup (function (e) {
 		if (e.keyCode == 27 && popup_status == 1)
 			{
 			disable_popup ();
