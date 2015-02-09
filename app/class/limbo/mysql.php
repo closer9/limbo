@@ -952,6 +952,86 @@ class mysql
 		}
 	
 	/**
+	 * Inserts a value into a JSON string inside the database
+	 *
+	 * @param int|string $id	The identifier of the row to select
+	 * @param mixed $insert		The content you want inserted into the JSON string
+	 * @param string $column	The column name that contains the JSON
+	 * @param string $table		The name of the table
+	 * @param string $marker	The column name to use as the ID
+	 *
+	 * @return int The affected rows (should be 1)
+	 */
+	public function json_insert ($id, $insert, $column, $table = '', $marker = 'id')
+		{
+		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
+		$column	= $this->clean ($column);
+		$marker	= $this->clean ($marker);
+		$id		= $this->clean ($id);
+		
+		$result = $this->query ("SELECT `{$column}` FROM `{$table}` WHERE `{$marker}` = '{$id}'");
+		$result = $this->fetch_result ($result);
+		
+		if (($array = json_decode ($result[$column], true)) === null)
+			{
+			$array = array ();
+			}
+		
+		if (is_array ($insert))
+			{
+			foreach ($insert as $key => $value)
+				{
+				$array[$this->clean ($key)] = $this->clean_value ($value);
+				}
+			}
+			else
+			{
+			$insert = $this->clean_value ($insert);
+			
+			if (array_search ($insert, $array) === false)
+				{
+				$array[] = $insert;
+				}
+			}
+		
+		return $this->update ($id, array ($column => json_encode ($array)), $table, $marker);
+		}
+	
+	/**
+	 * Removes a value from a JSON string inside the database
+	 *
+	 * @param int|string $id		The identifier of the row to select
+	 * @param int|string $delete	The JSON record you want to remove from the string
+	 * @param string $column		The column name that contains the JSON
+	 * @param string $table			The name of the table
+	 * @param string $marker		The column name to use as the ID
+	 *
+	 * @return int The affected rows (should be 1)
+	 */
+	public function json_delete ($id, $delete, $column, $table = '', $marker = 'id')
+		{
+		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
+		$column	= $this->clean ($column);
+		$marker	= $this->clean ($marker);
+		$id		= $this->clean ($id);
+		
+		$result = $this->query ("SELECT `{$column}` FROM `{$table}` WHERE `{$marker}` = '{$id}'");
+		$result = $this->fetch_result ($result);
+		
+		if (($array = json_decode ($result[$column], true)) !== null)
+			{
+			if (($position = array_search ($delete, $array)) !== false)
+				{
+				unset ($array[$position]);
+				
+				return $this->update ($id, array ($column => json_encode ($array)), $table, $marker);
+				}
+			}
+		
+		return 0;
+		}
+	
+	/**
 	 * Delete a specific row in the database based on the specified column value
 	 * 
 	 * @param string $id			The value the row must have for the specified column
