@@ -98,4 +98,61 @@ class time
 		{
 		return self::time_since ($seconds);
 		}
+	
+	/**
+	 * Display the time difference in natural time for both past and future.
+	 *
+	 * > echo limbo\util\time::difference ('@' . (time() + 12345), 2)
+	 * > 3 hours, 25 minutes from now
+	 *
+	 * > echo limbo\util\time::difference ('@' . (time() - 654321))
+	 * > 1 week ago
+	 *
+	 * @param string $datetime	The @timestamp or Y-m-d H:i:s datetime
+	 * @param int $depth		The amount of detail to display 1 = least, 7 = max
+	 *
+	 * @return string The time in a natural string
+	 */
+	static function difference ($datetime, $depth = 1)
+		{
+		$now	= new \DateTime;
+		$marker	= new \DateTime ($datetime);
+		$diff	= $now->diff ($marker);
+		
+		$mode	= ($marker->getTimestamp () < time ()) ? ' ago' : ' from now';
+		
+		$diff->w = floor ($diff->d / 7);
+		$diff->d -= $diff->w * 7;
+		
+		$string = array (
+			'y' => 'year',
+			'm' => 'month',
+			'w' => 'week',
+			'd' => 'day',
+			'h' => 'hour',
+			'i' => 'minute',
+			's' => 'second',
+		);
+		
+		foreach ($string as $key => &$value)
+			{
+			if ($diff->$key)
+				{
+				$value = $diff->$key . ' ' . $value . ($diff->$key == 1 ? '' : 's');
+				}
+				else
+				{
+				unset ($string[$key]);
+				}
+			}
+		
+		$string = array_slice ($string, 0, ($depth));
+		
+		if (abs ($marker->getTimestamp () - $now->getTimestamp ()) < 30)
+			{
+			return 'Just now';
+			}
+		
+		return implode (', ', $string) . $mode;
+		}
 	}
