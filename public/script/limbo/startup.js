@@ -54,7 +54,7 @@ function javascript_init ()
 			};
 		}
 
-	$('#noticebox-close').click (function () {
+	$('.noticebox-close').click (function () {
 		var line = $(this).parent ('div');
 	
 		$.ajax ({
