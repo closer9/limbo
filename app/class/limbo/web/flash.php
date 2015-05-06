@@ -42,8 +42,7 @@ class flash implements \ArrayAccess, \IteratorAggregate, \Countable
 	 */
 	public function __destruct ()
 		{
-		// Save the next messages into the session
-		$_SESSION['limbo.flash'] = $this->messages['next'];
+		$this->close ();
 		}
 	
 	/**
@@ -120,6 +119,15 @@ class flash implements \ArrayAccess, \IteratorAggregate, \Countable
 			
 			$this->messages['next'][$group] = $message;
 			}
+		}
+	
+	/**
+	 * Take all the messages queued for the next session and save them.
+	 */
+	public function close ()
+		{
+		// Save the next messages into the session
+		$_SESSION['limbo.flash'] = $this->messages['next'];
 		}
 	
 	/********************************************************************************

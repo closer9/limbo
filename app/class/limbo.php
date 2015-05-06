@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1163';
+	public static $version	= '0.1.5.1164';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -511,6 +511,15 @@ class limbo
 			}
 		
 		return self::flash ()->get_all ();
+		}
+	
+	/**
+	 * Sometimes we'll want to close out the session data before the page is finished. This method
+	 * allows us to save the queued flash messages before the object destructs on it's own.
+	 */
+	public static function flash_close ()
+		{
+		self::flash ()->close ();
 		}
 	
 	/********************************************************************************
