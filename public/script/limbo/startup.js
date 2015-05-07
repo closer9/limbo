@@ -13,8 +13,7 @@ function javascript_init ()
 	$('#focus,.focus').focus ();
 
 	/* Manage the stripes for table listings */
-	$('table.list tr:nth-child(odd)').addClass ('stripe');
-	$('table.list tr:nth-child(even)').removeClass ('stripe');
+	restripe_tables ();
 
 	/* Make the popup-box movable */
 	$('#popup-box').draggable ({handle: '#popup-title'});

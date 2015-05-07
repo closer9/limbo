@@ -25,3 +25,9 @@ function ucfirst (str)
 
 	return first + str.substr (1);
 	}
+
+function restripe_tables ()
+	{
+	$('table.list tr').removeClass ('stripe');
+	$('table.list tr:visible:odd').addClass ('stripe');
+	}
