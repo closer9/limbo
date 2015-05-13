@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1166';
+	public static $version	= '0.1.5.1167';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -372,7 +372,7 @@ class limbo
 			// Looks like we want a directory, append the slash and try again
 			if (is_dir (config ('path.section') . self::request ()->page))
 				{
-				redirect (self::request ()->url . '/');
+				limbo\web\web::redirect (self::request ()->url . '/', array (), 301);
 				}
 			
 			// If we don't have a file to read from, that's a 404
