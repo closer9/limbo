@@ -110,10 +110,11 @@ class time
 	 *
 	 * @param string $datetime	The @timestamp or Y-m-d H:i:s datetime
 	 * @param int $depth		The amount of detail to display 1 = least, 7 = max
-	 *
+	 * @param bool $append		Append the 'ago' or 'from now' string
+	 * 
 	 * @return string The time in a natural string
 	 */
-	static function difference ($datetime, $depth = 1)
+	static function difference ($datetime, $depth = 1, $append = true)
 		{
 		$now	= new \DateTime;
 		$marker	= new \DateTime ($datetime);
@@ -153,6 +154,50 @@ class time
 			return 'Just now';
 			}
 		
-		return implode (', ', $string) . $mode;
+		return implode (', ', $string) . (($append) ? $mode : '');
+		}
+	
+	/**
+	 * Modify a submitted string date or unix timestamp by adding or subtracting a
+	 * specified number of days.
+	 *
+	 * @param mixed		$date	The date in string or timestamp
+	 * @param string	$mode	The modifier
+	 * @param int    	$day	The number of days to adjust by
+	 * @param string 	$format The output format (string or stamp)
+	 *
+	 * @return int|string
+	 */
+	static function modify_date ($date, $mode = '+', $day = 1, $format = 'stamp')
+		{
+		// Check if the submitted date is a string or stamp
+		if (self::validate_date ($date))
+			{
+			$date = strtotime ($date);
+			}
+		
+		// Create the new date in timestamp format
+		$return = strtotime (date ('Y-m-d', $date) . " {$mode} {$day} day");
+		
+		if ($format == 'string')
+			{
+			return date ('Y-m-d', $return);
+			}
+		
+		return $return;
+		}
+	
+	/**
+	 * Validates a submitted date string
+	 *
+	 * @param string $date The date to validate
+	 *
+	 * @return bool Returns true if the date is valid, false if not
+	 */
+	static function validate_date ($date)
+		{
+		$validate = \DateTime::createFromFormat ('Y-m-d', $date);
+		
+		return ($validate && $validate->format('Y-m-d') == $date);
 		}
 	}
