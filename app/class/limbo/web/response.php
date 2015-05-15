@@ -330,7 +330,7 @@ class response
 			{
 			log::debug ('Sending default caching headers');
 			
-			$this->cache ((config ('web.cache')) ? 3600 : false);
+			$this->cache ((config ('cache.http')) ? 3600 : false);
 			}
 		
 		foreach ($this->headers as $field => $values)

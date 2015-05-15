@@ -13,23 +13,28 @@ $config['path.views']	= $config['path.app'] . 'views/';
 /* Class paths */
 $config['path.class']	= array (
 	$config['path.app'] . 'class/'
-);
+	);
 
 /* Website related configuration */
 $config['web.title']	= 'Limbo';
 $config['web.ssl']		= false;
 $config['web.root']		= '/';
 $config['web.template']	= 'limbo';
-$config['web.cache']	= false;
 $config['web.domains']	= array (
 	'limbo.neg9.com',
-);
+	);
+
+$config['cache.http']	= false;
+$config['cache.manual']	= true;
+$config['cache.driver']	= 'files';
+$config['cache.path']	= $config['path.storage'] . 'cache/';
+
 
 $config['web.css'] = array (
 	'//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css',
 	$config['web.root'] . 'css/limbo/common.css',
 	$config['web.root'] . 'css/limbo/limbo.css',
-);
+	);
 
 $config['web.javascript'] = array (
 	'//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js',
@@ -40,7 +45,7 @@ $config['web.javascript'] = array (
 	$config['web.root'] . 'script/limbo/helpers.js',
 	$config['web.root'] . 'script/limbo/popup.js',
 	$config['web.root'] . 'script/limbo/startup.js',
-);
+	);
 
 /* Logging configuration */
 $config['log.path']		= $config['path.storage'] . 'logs/';
@@ -53,7 +58,7 @@ $config['admin.name']	= 'Scott McKee';
 $config['admin.email']	= 'closer9@gmail.com';
 $config['admin.notify']	= array (
 	$config['admin.email'],
-);
+	);
 
 /* Email options */
 $config['smtp.server']		= 'localhost';
@@ -74,9 +79,9 @@ $config['secure.salt']	= "8juhebg27&LIU\nF&#fo3ffF\t\t)(Qf:DShf8h\ne)ls2u^hena-O
 $config['database.options'] = array (
 	'connections' => array (
 		'default' => array ('localhost', 'limbo', 'password', 'limbo_db'),
-	),
+		),
 	'email' => $config['error.mail'],
-);
+	);
 
 /* Setup the authentication class */
 $config['auth.options'] = array (
@@ -90,7 +95,7 @@ $config['auth.options'] = array (
 	//'db_heartbeat'=> 'auth_heartbeat',
 	'database'		=> 'default',
 	'validate'		=> true
-);
+	);
 
 /* Load the config */
 config ($config);

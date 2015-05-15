@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1167';
+	public static $version	= '0.1.5.1170';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -435,29 +435,79 @@ class limbo
 	 * Alternate way to connect to our methods
 	 *******************************************************************************/
 	
+	/**
+	 * @return \limbo\web\request
+	 */
 	public static function request ()
 		{
 		return self::ioc ('request');
 		}
 	
+	/**
+	 * @return \limbo\web\response
+	 */
 	public static function response ()
 		{
 		return self::ioc ('response');
 		}
 	
+	/**
+	 * @return \limbo\web\router
+	 */
 	public static function router ()
 		{
 		return self::ioc ('router');
 		}
 	
+	/**
+	 * @return \limbo\view
+	 */
 	public static function view ()
 		{
 		return self::ioc ('view');
 		}
 	
+	/**
+	 * @return \limbo\web\flash
+	 */
 	public static function flash ()
 		{
 		return self::ioc ('flash');
+		}
+	
+	/********************************************************************************
+	 * Setup the caching method to allow driver changing within the scripts
+	 *******************************************************************************/
+	
+	/**
+	 * Returns the container for the cache object utilizing the driver they requested
+	 *
+	 * @param string $driver The caching driver to use (defaults to the config setting)
+	 * 
+	 * @return \limbo\cache\cache IOC of the cache + driver object. Null if caching is off
+	 */
+	public static function cache ($driver = '')
+		{
+		if (config ('cache.manual'))
+			{
+			$driver = (empty ($driver)) ? config ('cache.driver') : $driver;
+			
+			if (empty (self::$ioc['cache-' . $driver]))
+				{
+				self::$ioc['cache.driver'] = $driver;
+				
+				self::$ioc["cache_{$driver}"] = function ($c)
+					{
+					$driver = '\\limbo\\cache\\drivers\\' . $c['cache.driver'];
+					
+					return new $driver ();
+					};
+				}
+			
+			return self::ioc ("cache_{$driver}");
+			}
+		
+		return null;
 		}
 	
 	/********************************************************************************
