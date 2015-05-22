@@ -42,7 +42,7 @@ abstract class cache implements driver
 			'expires_time'	=> time () + $time,
 			);
 		
-		log::debug ("Setting new cached value for {$keyword}");
+		log::debug ("Setting new cached value for key '{$keyword}'");
 		
 		return $this->driver_set ($keyword, $object, $time, $option);
 		}
@@ -54,11 +54,9 @@ abstract class cache implements driver
 			return null;
 			}
 		
-		log::debug ("Retrieving cached value for {$keyword}");
+		log::debug ("Searching for cached key '{$keyword}'");
 		
-		$object = $this->driver_get ($keyword, $option);
-		
-		if ($object == null)
+		if (($object = $this->driver_get ($keyword, $option)) == null)
 			{
 			return null;
 			}
@@ -66,35 +64,36 @@ abstract class cache implements driver
 		return (isset ($option['all_keys']) && $option['all_keys']) ? $object : $object['value'];
 		}
 	
-	public function info ($keyword, $option = array ())
+	public function info ($keyword)
 		{
-		$object = $this->driver_get ($keyword, $option);
-		
-		if ($object == null)
-			{
-			return null;
-			}
-		
-		return $object;
+		return $this->get ($keyword, array ('all_keys'));
 		}
 	
 	public function delete ($keyword, $option = array ())
 		{
+		log::debug ("Deleting cached key '{$keyword}'");
+		
 		return $this->driver_delete ($keyword, $option);
 		}
 	
 	public function stats ($option = array ())
 		{
+		log::debug ("Fetching statistics for cached key '{$keyword}'");
+		
 		return $this->driver_stats ($option);
 		}
 	
 	public function clean ($option = array ())
 		{
+		log::debug ("Cleaning up expired cache keys");
+		
 		return $this->driver_clean ($option);
 		}
 	
 	public function flush ($option = array ())
 		{
+		log::debug ("Deleting all stored cache keys");
+		
 		return $this->driver_flush ($option);
 		}
 	
