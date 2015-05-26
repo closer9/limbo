@@ -66,19 +66,23 @@ class files extends cache implements driver
 		
 		if (! is_dir ($path))
 			{
-			$umask = umask (0);
-			
-			if (! mkdir ($path, 0777, true))
-				{
-				throw new error ("Unable to create {$path}");
-				}
-			
-			umask ($umask);
+			$this->storage_create ($path);
 			}
 		
 		return $path . $file;
 		}
 	
+	private function storage_create ($path)
+		{
+		$umask = umask (0);
+		
+		if (! mkdir ($path, 0777, true))
+			{
+			throw new error ("Unable to create {$path}");
+			}
+		
+		umask ($umask);
+		}
 	
 	public function driver_set ($keyword, $value = '', $time = 600, array $option = array ())
 		{
@@ -193,13 +197,26 @@ class files extends cache implements driver
 	
 	public function driver_flush (array $option = array ())
 		{
-		file::delete_tree (config ('cache.path'));
-		
-		$mask = umask (0);
-		
-		mkdir (config ('cache.path'), 0777, true);
-		
-		umask ($mask);
+		if (! empty ($option['search']))
+			{
+			$files	= file::filelist (config ('cache.path'));
+			
+			foreach ($files as $file)
+				{
+				$file = substr ($file, 6, -6);
+				
+				if (preg_match ("/^{$option['search']}/i", $file))
+					{
+					$this->driver_delete ($file);
+					}
+				}
+			}
+			else
+			{
+			file::delete_tree (config ('cache.path'));
+			
+			$this->storage_create (config ('cache.path'));
+			}
 		}
 	
 	public function expired (array $object)

@@ -92,7 +92,10 @@ abstract class cache implements driver
 	
 	public function flush ($option = array ())
 		{
-		log::debug ("Deleting all stored cache keys");
+		if (! empty ($option['search']))
+			log::debug ("Deleting all stored cache keys starting with '{$option['search']}'");
+			else
+			log::debug ("Deleting all stored cache keys");
 		
 		return $this->driver_flush ($option);
 		}

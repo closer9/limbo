@@ -1661,6 +1661,8 @@ class auth
 				'script'	=> \limbo::request()->pid,
 				'comment'	=> $comment
 				), $this->db_audit);
+			
+			log::debug ("Audit log: {$comment}");
 			}
 		}
 	
