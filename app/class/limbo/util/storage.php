@@ -230,7 +230,7 @@ class storage
 	 *
 	 * @return bool
 	 */
-	public static function download ($app, $file, $type = '', $size = 0, $attach = false)
+	public static function download ($app, $file, $type = '', $size = 0, $attach = false, $cache = false)
 		{
 		log::debug ("STORAGE - Downloading {$file} for {$app}");
 		
@@ -241,10 +241,10 @@ class storage
 			$mode = ($attach) ? 'attachment' : 'inline';
 			
 			\limbo::response()
+				->cache ($cache)
 				->header ('Content-Type', $type)
 				->header ('Content-Lenth', $size)
 				->header ('Content-Disposition', "{$mode}; filename=\"{$file}\"")
-				->cache (false)
 				->write (self::get ($app, $file))
 				->send ();
 			}
