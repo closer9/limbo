@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1173';
+	public static $version	= '0.1.5.1174';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -350,7 +350,7 @@ class limbo
 				{
 				log::debug ('Found config file! (' . $directory . 'config.inc.php)');
 					
-				file::import ($directory . 'config.inc.php', false);
+				file::import ($directory . 'config.inc.php');
 				}
 			
 			if (is_readable ($directory . 'config.db.php'))
@@ -624,10 +624,8 @@ class limbo
 			{
 			self::$ioc[$name] = $value;
 			}
-			else
-			{
-			return self::$ioc[$name];
-			}
+		
+		return self::$ioc[$name];
 		}
 	
 	/**
