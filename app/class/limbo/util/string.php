@@ -104,4 +104,25 @@ class string
 		
 		return (true === $trim) ? trim ($string, $character) : $string;
 		}
+	
+	/**
+	 * Creates a string of key/value pairs from an associative array
+	 *
+	 * @param array  $variables		The array of keys/values to use
+	 * @param string $delimiter		The separator to use between the pairs
+	 *
+	 * @return string
+	 */
+	static function querystring (array $variables, $delimiter = '&')
+		{
+		if (count ($variables) > 0)
+			{
+			return implode ($delimiter, array_map (function ($item)
+				{
+				return $item[0] . '=' . $item[1];
+				}, array_map (null, array_keys ($variables), $variables)));
+			}
+		
+		return '';
+		}
 	}
