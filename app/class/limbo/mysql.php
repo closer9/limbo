@@ -789,7 +789,7 @@ class mysql
 			((empty ($table)) ? $this->sql_table : $table),
 			), false);
 		
-		if ($this->num_rows (null, $result) > 0)
+		if ($this->rows (null, $result) > 0)
 			{
 			return $this->fetch_result ($result);
 			}

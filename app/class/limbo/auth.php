@@ -665,7 +665,7 @@ class auth
 			session_id ()
 			), false);
 		
-		if ($this->sql->num_rows (null, $result))
+		if ($this->sql->rows (null, $result))
 			{
 			log::debug ('The session was found!');
 			
@@ -735,7 +735,7 @@ class auth
 					$this->authid
 					), false);
 				
-				if (($count = $this->sql->num_rows (null, $result)))
+				if (($count = $this->sql->rows (null, $result)))
 					{
 					if ($count == 1)
 						{
@@ -1365,7 +1365,7 @@ class auth
 				$keyname
 				), false);
 			
-			if ($this->sql->num_rows (null, $result))
+			if ($this->sql->rows (null, $result))
 				{
 				$fetch = $this->sql->fetch_result ($result);
 				
@@ -1514,7 +1514,7 @@ class auth
 					$username,
 					), false);
 				
-				if ($this->sql->num_rows (null, $result) > 0)
+				if ($this->sql->rows (null, $result) > 0)
 					{
 					$this->session['authid'] = $authid;
 					
