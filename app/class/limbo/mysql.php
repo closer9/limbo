@@ -877,6 +877,31 @@ class mysql
 		}
 	
 	/**
+	 * Delete a specific row in the database based on the specified column value
+	 *
+	 * @param string $id			The value the row must have for the specified column
+	 * @param string $table			The name of the table
+	 * @param string $marker		The column name to compare the ID with
+	 *
+	 * @return \mysqli_result
+	 */
+	public function delete ($id, $table = '', $marker = 'id')
+		{
+		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
+		$marker	= $this->clean ($marker);
+		$id		= $this->clean ($id);
+		
+		return $this->query ("DELETE FROM `{$table}` WHERE `{$marker}` = '{$id}'", false);
+		}
+	
+	public function del_id ($id, $table = '', $marker = 'id')
+		{
+		log::warning ('Using depreciated method "del_id"');
+		
+		return $this->delete ($id, $table, $marker);
+		}
+	
+	/**
 	 * Increase the specified column value by 1
 	 * 
 	 * @param string $id		The value of the column up want to use as a key (the ID)
@@ -931,7 +956,7 @@ class mysql
 	 * @return bool|int
 	 * @throws error
 	 */
-	public function num_rows ($query = '', \mysqli_result $result = null)
+	public function rows ($query = '', \mysqli_result $result = null)
 		{
 		if (! empty ($query) && $result === null)
 			{
@@ -948,6 +973,23 @@ class mysql
 			}
 		
 		return false;
+		}
+	
+	public function num_rows ($query = '', \mysqli_result $result = null)
+		{
+		log::warning ('Using depreciated method "num_rows"');
+		
+		return $this->rows ($query, $result);
+		}
+	
+	/**
+	 * Return the number of affected rows from the last query
+	 *
+	 * @return mixed
+	 */
+	public function affected ()
+		{
+		return $this->mysql->affected_rows;
 		}
 	
 	/**
@@ -1028,41 +1070,6 @@ class mysql
 			}
 		
 		return 0;
-		}
-	
-	/**
-	 * Delete a specific row in the database based on the specified column value
-	 * 
-	 * @param string $id			The value the row must have for the specified column
-	 * @param string $table			The name of the table
-	 * @param string $marker		The column name to compare the ID with
-	 *
-	 * @return \mysqli_result
-	 */
-	public function delete ($id, $table = '', $marker = 'id')
-		{
-		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
-		$marker	= $this->clean ($marker);
-		$id		= $this->clean ($id);
-		
-		return $this->query ("DELETE FROM `{$table}` WHERE `{$marker}` = '{$id}'", false);
-		}
-	
-	public function del_id ($id, $table = '', $marker = 'id')
-		{
-		log::warning ('Using depreciated method "del_id"');
-		
-		return $this->delete ($id, $table, $marker);
-		}
-	
-	/**
-	 * Return the number of affected rows from the last query
-	 * 
-	 * @return mixed
-	 */
-	public function affected ()
-		{
-		return $this->mysql->affected_rows;
 		}
 	
 	/**
