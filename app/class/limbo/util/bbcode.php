@@ -175,9 +175,22 @@ class bbcode
 	/* [img] [/img] */
 	private static function image ($content)
 		{
-		$content = preg_replace ('/\[img\](.*)\[\/img\]/Usie', "'<img src=\"\\1\" alt=\"' . basename('\\1') . '\" />'", $content);
-		$content = preg_replace ('/\[img=(.*)\](.*)\[\/img\]/Usie', "'<a href=\"\\1\" class=\"photobox\"><img src=\"\\2\" alt=\"' . basename('\\1') . '\"/></a>'", $content);
-
+		$content = preg_replace_callback (
+			'/\[img\](.*)\[\/img\]/Usi',
+			function ($m) {
+				return "<img src=\"{$m[1]}\" alt=\"" . basename ($m[1]) . "\">";
+				},
+			$content
+			);
+		
+		$content = preg_replace_callback (
+			'/\[img=(.*)\](.*)\[\/img\]/Usi',
+			function ($m) {
+				return "<a href=\"{$m[1]}\" class=\"photobox\"><img src=\"$m[2]\" alt=\"" . basename ($m[1]) . "\"/></a>";
+				},
+			$content
+			);
+		
 		return $content;
 		}
 	
