@@ -30,41 +30,24 @@ class log
 	 */
 	private static function write ($input, $type, $level)
 		{
-		if (config ('log.type') == 'none') return;
+		if (! config ('log.enable')) return;
 		
-		switch (config ('log.type'))
-			{
-			case 'daily':
-				$file = config ('path.storage') . 'logs/' . date ('Y-m-d') . '.log';
-				break;
-			
-			case 'weekly':
-				$file = config ('path.storage') . 'logs/' . date ('W') . '.log';
-				break;
-
-			case 'monthly':
-				$file = config ('path.storage') . 'logs/' . date ('Y-m') . '.log';
-				break;
-			
-			default: return;
-			}
-		
-		// Make sure we're logging that this level
+		// Make sure we're logging at the allowed level
 		if ($level <= config ('log.level'))
 			{
-			// Build the entry
-			$output = date ('[Y-m-d H:i:s] - ') . $type . ' - ' . $input . PHP_EOL;
+			$file	= config ('log.path') . date (config ('log.format')) . '.log';
+			$output	= date ('[Y-m-d H:i:s] - ') . $type . ' - ' . $input . PHP_EOL;
 			
 			try {
 				if (! is_resource (self::$logger))
 					{
 					if (is_writable (config ('path.storage')))
 						{
-						// Try to create the logs directory if it's not available
-						if (! is_dir (config ('path.storage') . 'logs/'))
+						// Try to create the log directory if it's not available
+						if (! is_dir (config ('log.path')))
 							{
-							mkdir (config ('path.storage') . 'logs/');
-							chmod (config ('path.storage') . 'logs/', 0777);
+							mkdir (config ('log.path'));
+							chmod (config ('log.path'), 0777);
 							}
 						
 						// Try to create the file
@@ -103,9 +86,10 @@ class log
 	 */
 	public static function cleanup ()
 		{
-		if (config ('log.type') == 'none') return;
+		if (! config ('log.enable')) return;
 		
-		$expire_time = time () - (config ('log.retain') * 86400);
+		// Get the date of the oldest logfile to keep
+		$expire_time = util\time::modify_date (time (), '-', config ('log.retain'));
 		
 		foreach (scandir (config ('log.path')) as $logfile)
 			{
@@ -113,13 +97,23 @@ class log
 			
 			if (is_file ($filepath) && is_writable ($filepath))
 				{
-				$mtime = filemtime ($filepath);
-				
-				if ($mtime < $expire_time)
+				if (config ('log.retain') > 0 && filemtime ($filepath) < $expire_time)
 					{
-					self::warning ("Log file {$logfile} is past retention and will be deleted");
+					self::info ("Log file {$logfile} is past retention and will be deleted");
 					
 					unlink ($filepath);
+					}
+				
+				if (config ('log.compress'))
+					{
+					$previous = date (config ('log.format'), util\time::modify_date (time (), '-', 1));
+					
+					if ($logfile == "{$previous}.log")
+						{
+						self::info ("Compressing the previous days log file: {$logfile}");
+						
+						util\file::compress ($filepath, 9, true);
+						}
 					}
 				}
 			}
@@ -139,14 +133,14 @@ class log
 		self::write ($input, 'error', $level);
 		}
 	
-	static function info ($input, $level = 2)
-		{
-		self::write ($input, 'info', $level);
-		}
-
-	static function warning ($input, $level = 3)
+	static function warning ($input, $level = 2)
 		{
 		self::write ($input, 'warning', $level);
+		}
+	
+	static function info ($input, $level = 3)
+		{
+		self::write ($input, 'info', $level);
 		}
 
 	static function debug ($input, $level = 4)

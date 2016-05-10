@@ -49,9 +49,11 @@ $config['web.javascript'] = array (
 
 /* Logging configuration */
 $config['log.path']		= $config['path.storage'] . 'logs/';
-$config['log.type']		= 'daily';								// daily, weekly, monthly, none
-$config['log.level']	= 4;									// 1 - notices, 4 - debug
+$config['log.enable']	= true;									// Enable or disable logging
+$config['log.format']	= 'Y-m-d';								// The datetime format you want the logs saved as
+$config['log.level']	= 4;									// 1 - errors, 2 - warnings, 3 - info, 4 - debug
 $config['log.retain']	= 7;									// How many log files to keep (0 = keep all)
+$config['log.compress']	= true;									// Compress previous log files
 
 /* Admin configuration */
 $config['admin.name']	= 'Scott McKee';
