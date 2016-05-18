@@ -90,7 +90,7 @@ class flash implements \ArrayAccess, \IteratorAggregate, \Countable
 		}
 	
 	/**
-	 * Sets a bew flash message for display on the next viewing
+	 * Sets a new flash message for display on the next viewing
 	 * 
 	 * @param string $group
 	 * @param string $message
@@ -118,6 +118,33 @@ class flash implements \ArrayAccess, \IteratorAggregate, \Countable
 				}
 			
 			$this->messages['next'][$group] = $message;
+			}
+		}
+	
+	/**
+	 * Clears out any saved flash messages. If no group is specified all messages will be cleared
+	 *
+	 * @param string $group
+	 */
+	public function clear ($group = '')
+		{
+		if (empty ($group))
+			{
+			log::debug ("Clearing all flash messages");
+			
+			$this->messages = array (
+				'current' 	=> array (),
+				'next' 		=> array (),
+				'now'  		=> array ()
+				);
+			}
+			else
+			{
+			log::debug ("Clearing all flash messages for group '{$group}'");
+			
+			unset ($this->messages['now'][(string) $group]);
+			unset ($this->messages['next'][(string) $group]);
+			unset ($this->messages['current'][(string) $group]);
 			}
 		}
 	

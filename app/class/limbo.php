@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1180';
+	public static $version	= '0.1.5.1181';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -549,7 +549,7 @@ class limbo
 	 * Get an array of flash messages for the current request. You can optionally specify a flash
 	 * group to limit your messages by.
 	 * 
-	 * @param string $group The name of the group to filter your messages by
+	 * @param string $group The group to filter your messages by (if empty, return all messages)
 	 *
 	 * @return array An array of flash messages
 	 */
@@ -561,6 +561,17 @@ class limbo
 			}
 		
 		return self::flash ()->get_all ();
+		}
+	
+	/**
+	 * Clear out any flash messages for a group. You can also clear out all messages if the group is
+	 * not specified.
+	 *
+	 * @param string $group The name of the group to clear (clear all if empty)
+	 */
+	public static function flash_clear ($group = '')
+		{
+		self::flash ()->clear ($group);
 		}
 	
 	/**
