@@ -147,3 +147,18 @@ if (! function_exists('dd'))
 		array_map (function ($x) { var_dump ($x); }, func_get_args()); die;
 		}
 	}
+
+if (! function_exists ('auto_version'))
+	{
+	function auto_version ($file)
+		{
+		if (! file_exists ($_SERVER['DOCUMENT_ROOT'] . $file))
+			{
+			return $file;
+			}
+		
+		$mtime = filemtime ($_SERVER['DOCUMENT_ROOT'] . $file);
+		
+		return preg_replace ('{\\.([^./]+)$}', ".{$mtime}.\$1", $file);
+		}
+	}

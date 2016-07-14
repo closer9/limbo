@@ -32,8 +32,8 @@ $config['cache.path']	= $config['path.storage'] . 'cache/';
 
 $config['web.css'] = array (
 	'//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css',
-	$config['web.root'] . 'css/limbo/common.css',
-	$config['web.root'] . 'css/limbo/limbo.css',
+	$config['web.root'] . auto_version ('css/limbo/common.css'),
+	$config['web.root'] . auto_version ('css/limbo/limbo.css'),
 	);
 
 $config['web.javascript'] = array (
