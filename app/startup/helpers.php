@@ -7,7 +7,7 @@
 
 if (! function_exists ('config'))
 	{
-	function config ($option = null, $value = null)
+	function config ($option = null, $value = null, $sort = false)
 		{
 		if ($option === null)
 			{
@@ -28,7 +28,22 @@ if (! function_exists ('config'))
 			\limbo::$config[$option] = $value;
 		
 		if (isset (\limbo::$config[$option]))
+			{
+			if ($sort)
+				{
+				switch ($sort)
+					{
+					case 'sort':	sort (\limbo::$config[$option]); 	break;
+					case 'rsort':	rsort (\limbo::$config[$option]); 	break;
+					case 'asort':	asort (\limbo::$config[$option]); 	break;
+					case 'arsort':	arsort (\limbo::$config[$option]); 	break;
+					case 'ksort':	ksort (\limbo::$config[$option]); 	break;
+					case 'krsort':	krsort (\limbo::$config[$option]); 	break;
+					}
+				}
+			
 			return \limbo::$config[$option];
+			}
 
 		return null;
 		}
