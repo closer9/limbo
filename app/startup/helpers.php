@@ -152,7 +152,7 @@ if (! function_exists ('auto_version'))
 	{
 	function auto_version ($file)
 		{
-		if (! ($mtime = filemtime ($_SERVER['DOCUMENT_ROOT'] . $file)))
+		if (limbo::invoked_from () == 'cli' || ! ($mtime = filemtime ($_SERVER['DOCUMENT_ROOT'] . $file)))
 			{
 			return $file;
 			}
