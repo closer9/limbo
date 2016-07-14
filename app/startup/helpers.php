@@ -152,12 +152,10 @@ if (! function_exists ('auto_version'))
 	{
 	function auto_version ($file)
 		{
-		if (! file_exists ($_SERVER['DOCUMENT_ROOT'] . $file))
+		if (! ($mtime = filemtime ($_SERVER['DOCUMENT_ROOT'] . $file)))
 			{
 			return $file;
 			}
-		
-		$mtime = filemtime ($_SERVER['DOCUMENT_ROOT'] . $file);
 		
 		return preg_replace ('{\\.([^./]+)$}', ".{$mtime}.\$1", $file);
 		}
