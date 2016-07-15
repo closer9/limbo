@@ -408,6 +408,18 @@ class mysql
 		}
 	
 	/**
+	 * Retrieve a SQL query from the saved history.
+	 *
+	 * @param int $history The query to retrieve (0 - newest)
+	 *
+	 * @return string The requested query
+	 */
+	public function get_query ($history = 0)
+		{
+		return $this->sql_queries[$history];
+		}
+	
+	/**
 	 * Truncate a table
 	 * 
 	 * @param string $table		The name of the table to truncate
