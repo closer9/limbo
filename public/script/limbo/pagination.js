@@ -35,6 +35,7 @@
 		'colms'		: '',		// What columns to sort by
 		'order'		: '',		// What order to sort in
 		'hide'		: false,	// Hide navigation if no pages exist
+		'showall'   : false,    // Show an all button to stop pagination
 		
 		'function_default'	: false,	// Any default post-processing functions go here
 		'function'			: false		// Any page-specific processing
@@ -66,6 +67,18 @@
 		{
 		$($.fn.pagination.settings['target']).html
 			('<div class="textc vmid pt10"><img src="' + $.fn.pagination.settings['throbber'] + '"></div>');
+		};
+
+	$.fn.pagination.showall = function ()
+		{
+		$.fn.pagination.settings['hide']	= true;
+		$.fn.pagination.settings['display'] = $.fn.pagination.settings['total'];
+		
+		$('#pag-table-cell1').hide ();
+		$('#pag-table-cell2').html ('<img src="' + $.fn.pagination.settings['throbber'] + '">');
+		$('#pag-table-cell3').hide ();
+		
+		$.fn.pagination.update (1);
 		};
 			
 	$.fn.pagination.navigation = function ()
@@ -134,6 +147,11 @@
 				}
 			}
 		
+		if ($.fn.pagination.settings['showall'])
+			{
+			cell_2 += '<span class="pag-button pag-nav-page round-2"><a href="Javascript: $.fn.pagination.showall ()">Show all</a></span>';
+			}
+		
 		if (page_curr != page_last)
 			{
 			cell_3 += '<span class="pag-button pag-nav-right round-2"><a href="Javascript: $.fn.pagination.update (' + page_next + ')">&gt;</a></span>';
@@ -146,9 +164,9 @@
 			}
 			
 		html = '<table id="pag-table" class="wide"><tr>';
-		html += '<td>' + cell_1 + '</td>';
-		html += '<td class="textc">' + cell_2 + '</td>';
-		html += '<td class="textr">' + cell_3 + '</td>';
+		html += '<td id="pag-table-cell1">' + cell_1 + '</td>';
+		html += '<td id="pag-table-cell2" class="textc">' + cell_2 + '</td>';
+		html += '<td id="pag-table-cell3" class="textr">' + cell_3 + '</td>';
 		html += '</tr></table>';
 		
 		$.fn.pagination.settings['this'].html (html);
