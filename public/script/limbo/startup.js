@@ -10,7 +10,7 @@ function javascript_init ()
 	if (typeof reload_popups == 'function') { reload_popups (); }
 		
 	/* Set the default focus */
-	$('#focus,.focus').focus ();
+	$('#focus,.focus').focus_cursor ();
 
 	/* Manage the stripes for table listings */
 	restripe_tables ();
