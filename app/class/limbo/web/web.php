@@ -49,6 +49,21 @@ class web
 		}
 	
 	/**
+	 * Flush the write buffer(s) out to the client
+	 *
+	 * @param string $text Optional string to send before the flush
+	 */
+	public static function flush ($text = '')
+		{
+		if (! empty ($text))
+			{
+			echo $text;
+			}
+		
+		ob_flush (); flush ();
+		}
+	
+	/**
 	 * Redirect to another page
 	 *
 	 * @param string $location		The relative location to redirect to
