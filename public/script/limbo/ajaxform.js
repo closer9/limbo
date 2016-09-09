@@ -141,6 +141,12 @@
 		/* Process any complete function data */
 		options.complete.apply (options.form, [results]);
 		
+		/* Adjust any supplied hash data */
+		if (results.hash != '')
+			{
+			document.location.hash = results.hash;
+			}
+		
 		/* What do we do with the data? */
 		switch (results.code)
 			{
@@ -166,7 +172,7 @@
 				break;
 			
 			case 'reload':
-				window.location.reload ();
+				window.location.reload (true);
 				break;
 			
 			case 'close':
