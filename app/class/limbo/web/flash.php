@@ -149,6 +149,53 @@ class flash implements \ArrayAccess, \IteratorAggregate, \Countable
 		}
 	
 	/**
+	 * Displays the current flash message(s) to the user. You can specify the type of
+	 * message (warning, notice, message) by preceding the flash message with an identifier
+	 * of "!" for warning, "-" for notice, and "*" for message.
+	 *
+	 * @param string $group
+	 * @param string $default   The default message class to use
+	 * @param string $class     Any additional css classes to append
+	 * @param bool   $echo      Echo the message(s) in addition to returning them
+	 */
+	public function display ($group, $default = 'message', $class = '')
+		{
+		$warning = array ();
+		$notice	 = array ();
+		$message = array ();
+		$output  = '';
+		
+		// Make sure we have a type specified 
+		$default = (empty ($default)) ? 'message' : $default;
+		
+		if ($this->get ($group))
+			{
+			foreach ($this->get ($group) as $text)
+				{
+				switch ($text{0})
+					{
+					case '!': $warning[] = trim (substr ($text, 1)); break;
+					case '-': $notice[]  = trim (substr ($text, 1)); break;
+					case '*': $message[] = trim (substr ($text, 1)); break;
+					
+					default: array_push ($$default, $text); break;
+					}
+				}
+			
+			if (count ($warning) > 0)
+				$output .=  '<p class="warning ' . $class . '">' . implode ('<br>', $warning) . '</p>';
+			
+			if (count ($notice) > 0)
+				$output .=  '<p class="notice slideup ' . $class . '">' . implode ('<br>', $notice) . '</p>';
+			
+			if (count ($message) > 0)
+				$output .= '<p class="message slideup ' . $class . '">' . implode ('<br>', $message) . '</p>';
+			}
+		
+		echo $output;
+		}
+	
+	/**
 	 * Take all the messages queued for the next session and save them.
 	 */
 	public function close ()
