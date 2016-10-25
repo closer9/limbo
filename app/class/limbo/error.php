@@ -13,7 +13,7 @@ use \limbo\web\web;
  * Class error
  * @package limbo
  */
-class error extends \exception
+class error extends \Exception
 	{
 	/**
 	 * @var bool Do we want to e-mail the error to administrator?
@@ -80,30 +80,30 @@ class error extends \exception
 		
 		if ($this->log)
 			{
-			log::error ($this->getmessage ());
-			log::error ($this->getfile ());
+			log::error ($this->getMessage());
+			log::error ($this->getFile ());
 			}
 		
 		// If it looks like this is from the CLI just display the message
 		if (\limbo::invoked_from () == 'cli')
 			{
-			echo "* Error: {$this->getmessage ()} ({$this->getfile ()} [{$this->getline ()}])\n";
+			echo "* Error: {$this->getMessage ()} ({$this->getFile ()} [{$this->getLine ()}])\n";
 			}
 			else
 			{
 			// Calling for a simple message (or no template specified)
 			if ($this->simple || ! $this->template)
 				{
-				$message = '<h2 style="color: red">An error has occurred</h2>' . $this->getmessage ();
+				$message = '<h2 style="color: red">An error has occurred</h2>' . $this->getMessage ();
 				
 				if (! config ('limbo.production'))
 					{
-					$message .= '<br><h6>File: ' . $this->getfile () . ' (' . $this->getline (). ')</h6>';
+					$message .= '<br><h6>File: ' . $this->getFile () . ' (' . $this->getLine (). ')</h6>';
 					$message .= '<pre>' . print_r (debug_backtrace (0, 20), true) . '</pre>';
 					}
 				
 				try {
-					\limbo::$response
+					\limbo::response ()
 						->status ($this->response)
 						->write ($message)
 						->send ();
@@ -118,9 +118,9 @@ class error extends \exception
 				{
 				// Render the error message in the content template
 				\limbo::render ($this->content, array (
-					'message' 	=> $this->getmessage (),
-					'file' 		=> $this->getfile (),
-					'line' 		=> $this->getline ()
+					'message' 	=> $this->getMessage (),
+					'file' 		=> $this->getFile (),
+					'line' 		=> $this->getLine ()
 					), 'content');
 				
 				// Render the content inside the display template
@@ -133,9 +133,9 @@ class error extends \exception
 				// Just render the display template
 				\limbo::render ($this->template, array (
 					'title' => config ('web.title') . ' - Error',
-					'message' 	=> $this->getmessage (),
-					'file' 		=> $this->getfile (),
-					'line' 		=> $this->getline ()
+					'message' 	=> $this->getMessage (),
+					'file' 		=> $this->getFile (),
+					'line' 		=> $this->getLine ()
 					));
 				}
 			}
@@ -152,12 +152,12 @@ class error extends \exception
 		
 		if (! $this->mail) return;
 		
-		$message	= "Error message: {$this->getmessage ()}\n"
-					. "Filename: {$this->getfile ()} ({$this->getline ()})\n"
+		$message	= "Error message: {$this->getMessage ()}\n"
+					. "Filename: {$this->getFile ()} ({$this->getLine ()})\n"
 					. "Referer: {$_SERVER['HTTP_REFERER']}\n"
 					. "URL: {$_SERVER["REQUEST_URI"]}\n"
 					. "Address: {$_SERVER['REMOTE_ADDR']}\n\n"
-					. "Backtrace info:\n {$this->gettraceasstring ()}\n\n"
+					. "Backtrace info:\n {$this->getTraceAsString ()}\n\n"
 					. 'GET variables: ' . print_r ($_GET, true) . "\n\n"
 					. 'POST variables: ' . print_r ($_POST, true) . "\n\n";
 		
