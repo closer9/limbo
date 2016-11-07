@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1189';
+	public static $version	= '0.1.5.1190';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -105,6 +105,12 @@ class limbo
 		
 		// Setup our IoC container to hold our objects
 		self::$ioc = new \limbo\pimple\container ();
+		
+		self::$ioc['config'] = function ()
+			{
+			// Utility for loading user created configurations
+			return new \limbo\config (config ('limbo.config_group'));
+			};
 		
 		self::$ioc['request'] = function ()
 			{
@@ -434,6 +440,19 @@ class limbo
 	/********************************************************************************
 	 * Alternate way to connect to our methods
 	 *******************************************************************************/
+	
+	/**
+	 * @param string $config The name of the default config group to use
+	 *
+	 * @return \limbo\config
+	 */
+	public static function config ($config = null)
+		{
+		if ($config !== null)
+			return self::ioc ('config')->group ($config);
+		
+		return self::ioc ('config');
+		}
 	
 	/**
 	 * @return \limbo\web\request

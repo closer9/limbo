@@ -1,7 +1,10 @@
 <?php
 /* Limbo options */
-$config['limbo.production']	= false;
-$config['limbo.timezone']	= 'America/Chicago';
+$config['limbo.production']	  = false;
+$config['limbo.timezone']	  = 'America/Chicago';
+$config['limbo.build_tables'] = true;
+$config['limbo.config_table'] = 'misc_config';
+$config['limbo.config_group'] = 'limbo';
 
 /* Filesystem paths */
 $config['path.dir']		= '/var/www/limbo.neg9.com/';

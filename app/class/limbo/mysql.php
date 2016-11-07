@@ -20,8 +20,10 @@ $config['database.options'] = array (
 
 namespace limbo;
 
-class mysql
-	{
+class mysql {
+	/**
+	 * @var \mysqli
+	 */
 	private $mysql;
 	
 	protected $db_default	= 'default';	// The default database server
@@ -30,6 +32,9 @@ class mysql
 	protected $db_password	= '';			// The default MySQL password
 	protected $db_database	= '';			// What database to connect to
 	
+	/**
+	 * @var \mysqli_result
+	 */
 	protected $sql_result	= null;			// The results of the last query
 	protected $sql_table	= '';			// The default table to use
 	protected $sql_queries	= array ();		// Place to store remembered queries
@@ -97,7 +102,8 @@ class mysql
 	 * @param string $options	An array of connection options or the name of a database
 	 * @param bool   $check		Specifies if we want to just check if we can connect or not
 	 *
-	 * @return bool|\mysqli
+	 * @return bool|mysql
+	 * 
 	 * @throws error
 	 */
 	public function connect ($options = '', $check = false)
@@ -107,7 +113,7 @@ class mysql
 		// Specifying a DB to connect to?
 		if (! is_array ($options))
 			{
-			$database	= $options;
+			$database = $options;
 			
 			// No database specified, try to use the default
 			if (empty ($database) && isset ($this->connections[$this->db_default]))
@@ -455,7 +461,7 @@ class mysql
 		
 		if (! $this->mysql->real_query ($query))
 			{
-			throw new error ("MySQL failed: {$this->mysqli->error} <br> {$query}");
+			throw new error ("MySQL failed: {$this->mysql->error} <br> {$query}");
 			}
 		
 		if ($this->mysql->field_count)
@@ -489,7 +495,7 @@ class mysql
 	 * 
 	 * @param string $query		The query you want to execute
 	 * @param array $variables	The list of variables you are injecting
-	 * @param bool $save		Save the mysql result inside the object
+	 * @param bool $save        Save the result set internally as well as return it
 	 *
 	 * @return bool|\mysqli_result
 	 * @throws error
@@ -713,9 +719,10 @@ class mysql
 	
 	/**
 	 * Returns the selected query as an array one row at a time
-	 * 
-	 * @param string $query		The optional query to execute
-	 * @param null   $key		The key (column) of the array (row) to return
+	 *
+	 * @param string $query		      The optional query to execute
+	 * @param null   $key		      The key (column) of the array (row) to return
+	 * @param \mysqli_result $result  A previous MySQL result object
 	 *
 	 * @return array
 	 */
@@ -765,7 +772,7 @@ class mysql
 		return $this->select (array ($column => $id), $table);
 		}
 	
-	public function get_id ($id, $table = '', $values = '*', $column = 'id')
+	public function get_id ($id, $table = '', $column = 'id')
 		{
 		log::warning ('Using depreciated method "mysql::get_id"');
 		
@@ -773,12 +780,14 @@ class mysql
 		}
 	
 	/**
-	 * Selects a single row from the database based on any number of search paramaters
+	 * Selects a single row from the database based on any number of search parameters
 	 * 
 	 * @param array  $params	The array of key => value search pairs
 	 * @param string $table		The name of the table
 	 *
 	 * @return bool|array	False on failure, array of row data on success
+	 * 
+	 * @throws error if no search parameters are specified
 	 */
 	public function select (array $params, $table = '')
 		{
@@ -810,32 +819,46 @@ class mysql
 		}
 	
 	/**
-	 * Inserts an array into the specified table. The array should be formatted in key => value
-	 * style. Where key is the column name.
+	 * Inserts an array into the specified table. The array should be formatted in key (column name) => value
+	 * style. We can also update existing rows automatically using the $update parameter. If the table uses
+	 * a unique key and we attempt to insert the same key, this option will update the existing row rather
+	 * than throw an error. This is useful if you don't know if a row exists already, but still need to 
+	 * insert/update the data (insert if not exists else update).
 	 * 
 	 * @param array  $input		The array to insert into the database
 	 * @param string $table		The table to insert into
-	 *
+	 * @param bool   $replace   Do we want to update the row if there is a unique key collision?
+	 * 
 	 * @return mixed
 	 */
-	public function insert (array $input, $table = '')
+	public function insert (array $input, $table = '', $replace = false)
 		{
 		$table		= (empty ($table)) ? $this->sql_table : $this->clean ($table);
 		$add_key	= array ();
 		$add_value	= array ();
+		$add_update = array ();
 		
 		foreach ($input as $key => $value)
 			{
-			$key = $this->clean ($key);
-			
-			$add_key[] 	= "`{$key}`";
-			$add_value[] 	= $this->clean_value ($value);
+			$key 	      = $this->clean ($key);
+			$add_value[]  = $this->clean_value ($value);
+			$add_key[] 	  = "`{$key}`";
+			$add_update[] = "`{$key}`=VALUES(`{$key}`)";
 			}
 		
 		// Join all the keys and values together
 		$keys	= implode (', ', $add_key);
 		$values	= implode (', ', $add_value);
+		$update = implode (", ", $add_update);
 		
+		if ($replace)
+			{
+			// Using ON DUPLICATE KEY UPDATE here instead of REPLACE because it's a little safer (no DELETE)
+			$this->query ("INSERT INTO `{$table}` ({$keys}) VALUES ({$values}) ON DUPLICATE KEY UPDATE {$update}", false);
+			
+			return $this->mysql->affected_rows;
+			}
+	
 		$this->query ("INSERT INTO `{$table}` ({$keys}) VALUES ({$values})", false);
 		
 		return $this->mysql->insert_id;
@@ -891,19 +914,36 @@ class mysql
 	/**
 	 * Delete a specific row in the database based on the specified column value
 	 *
-	 * @param string $id			The value the row must have for the specified column
-	 * @param string $table			The name of the table
-	 * @param string $marker		The column name to compare the ID with
+	 * @param mixed  $id     The value we're looking for, or an array of key->value pairs
+	 * @param string $table  The name of the table
+	 * @param string $marker The column name to compare the ID with
 	 *
 	 * @return \mysqli_result
 	 */
 	public function delete ($id, $table = '', $marker = 'id')
 		{
-		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
-		$marker	= $this->clean ($marker);
-		$id		= $this->clean ($id);
+		$table      = (empty ($table)) ? $this->sql_table : $this->clean ($table);
+		$marker     = $this->clean ($marker);
+		$options    = array ();
 		
-		return $this->query ("DELETE FROM `{$table}` WHERE `{$marker}` = '{$id}'", false);
+		if (is_array ($id))
+			{
+			foreach ($id as $key => $value)
+				{
+				$key       = $this->clean ($key);
+				$value     = $this->clean_value ($value);
+				$options[] = "`{$key}` = {$value}";
+				}
+			
+			$where = implode (' AND ', $options);
+			}
+			else
+			{
+			$id    = $this->clean_value ($id);
+			$where = "`{$marker}` = {$id}";
+			}
+		
+		return $this->query ("DELETE FROM `{$table}` WHERE {$where}", false);
 		}
 	
 	public function del_id ($id, $table = '', $marker = 'id')

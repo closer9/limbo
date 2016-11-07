@@ -7,44 +7,64 @@
 
 if (! function_exists ('config'))
 	{
-	function config ($option = null, $value = null, $sort = false)
+	function config ($name = null, $value = null, array $options = array ())
 		{
-		if ($option === null)
+		$options = array_merge (array (
+			'group' => 'limbo',
+			'store' => false,
+		    'sort'  => false,
+			), $options);
+		
+		// Just dump the whole config from memory if no $name is specified
+		if ($name === null && ksort (\limbo::$config))
 			{
-			ksort (\limbo::$config);
-			
 			return \limbo::$config;
 			}
 		
-		if (is_array ($option))
+		// If the $name is an array, loop through and save each key => value pair
+		if (is_array ($name))
 			{
-			foreach ($option as $key => $value)
-				\limbo::$config[$key] = $value;
+			foreach ($name as $key => $value)
+				{
+				config ($key, $value, $options);
+				}
 			
 			return true;
 			}
 		
+		// Save a single config option to memory / DB
 		if ($value !== null)
-			\limbo::$config[$option] = $value;
-		
-		if (isset (\limbo::$config[$option]))
 			{
-			if ($sort)
+			\limbo::$config[$name] = $value;
+			
+			// Try to store this in the DB if the 'config' container has been setup
+			if ($options['store'] && is_object (\limbo::ioc ('config')))
 				{
-				switch ($sort)
+				\limbo::config ($options['group'])->set ($name, $value);
+				}
+			
+			return true;
+			}
+		
+		// Check if $name exists and return the value
+		if (isset (\limbo::$config[$name]))
+			{
+			if ($options['sort'])
+				{
+				switch ($options['sort'])
 					{
-					case 'sort':	sort (\limbo::$config[$option]); 	break;
-					case 'rsort':	rsort (\limbo::$config[$option]); 	break;
-					case 'asort':	asort (\limbo::$config[$option]); 	break;
-					case 'arsort':	arsort (\limbo::$config[$option]); 	break;
-					case 'ksort':	ksort (\limbo::$config[$option]); 	break;
-					case 'krsort':	krsort (\limbo::$config[$option]); 	break;
+					case 'sort':	sort (\limbo::$config[$name]); 	    break;
+					case 'rsort':	rsort (\limbo::$config[$name]); 	break;
+					case 'asort':	asort (\limbo::$config[$name]); 	break;
+					case 'arsort':	arsort (\limbo::$config[$name]); 	break;
+					case 'ksort':	ksort (\limbo::$config[$name]); 	break;
+					case 'krsort':	krsort (\limbo::$config[$name]); 	break;
 					}
 				}
 			
-			return \limbo::$config[$option];
+			return \limbo::$config[$name];
 			}
-
+		
 		return null;
 		}
 	}
@@ -75,6 +95,14 @@ if (! function_exists ('register'))
 			return \limbo::$globals[$global];
 		
 		return null;
+		}
+	}
+
+if (! function_exists ('is_registered'))
+	{
+	function is_registered ($global)
+		{
+		return isset (\limbo::$globals[$global]);
 		}
 	}
 

@@ -62,8 +62,7 @@ namespace limbo;
 use \limbo\util\security;
 use \limbo\web\web;
 
-class auth
-	{
+class auth {
 	private $sql;
 	
 	protected $db_users		= 'auth_users';	// The default users table
@@ -91,7 +90,6 @@ class auth
 	private $superuser		= 100;			// The default superuser rank
 	private $group			= 0;			// The default group ID to check for (0 = don't check)
 	private $validate		= false;		// Check the IP address against the one used at login
-	private $database		= 'default';	// The default database connection name to use
 	private $lock_count		= 5;			// Maximum number of failed login attempts until locked
 	private $lock_time		= 300;			// How long after a lock until they can try again		
 	
@@ -126,14 +124,8 @@ class auth
 		
 		$this->sql = $sql_resource;
 		
-		if (! $this->sql->check_connection ())
-			{
-			// Try to make a connection if we're disconnected
-			$this->sql->connect ($this->database);
-			}
-		
 		// Are we supplied with a database layout
-		if (is_readable (config ('path.app') . 'sql/auth.php'))
+		if (config ('limbo.build_tables') && is_readable (config ('path.app') . 'sql/auth.php'))
 			{
 			$sql = array ();
 			
@@ -253,7 +245,7 @@ class auth
 	 */
 	private function record_error ($message)
 		{
-		log::warning ('Auth error: ' . $message);
+		log::error ("AUTH - {$message}");
 		
 		$this->errormsg = $message;
 		
@@ -794,7 +786,9 @@ class auth
 				}
 			}
 		
-		return $this->record_error ('No matching authenticated session found');
+		log::info ('No matching authenticated session found');
+		
+		return false;
 		}
 	
 	/**
@@ -1087,7 +1081,7 @@ class auth
 				}
 			else
 				{
-				$this->sql->insert (array_merge ($info, array ('authid' => $authid)), $this->db_info, 'authid');
+				$this->sql->insert (array_merge ($info, array ('authid' => $authid)), $this->db_info);
 				}
 			}
 		}
@@ -1110,7 +1104,7 @@ class auth
 				}
 				else
 				{
-				$this->sql->insert (array_merge ($settings, array ('authid' => (int) $authid)), $this->db_settings, 'authid');
+				$this->sql->insert (array_merge ($settings, array ('authid' => (int) $authid)), $this->db_settings);
 				}
 			}
 		}
