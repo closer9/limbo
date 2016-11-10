@@ -238,16 +238,17 @@ class auth {
 	/**
 	 * Logs a message into the errormsg variable. Always returns false so other methods
 	 * can return false while also setting the last error message.
-	 * 
-	 * @param $message
 	 *
-	 * @return bool
+	 * @param string $message  The message you want to remember
+	 * @param string|bool $log What type of log do you want to save this to, false if none
+	 *
+	 * @return false
 	 */
-	private function record_error ($message)
+	private function record_error ($message, $log = 'error')
 		{
-		log::error ("AUTH - {$message}");
-		
 		$this->errormsg = $message;
+		
+		if ($log) log::$log ("AUTH - {$message}");
 		
 		return false;
 		}
@@ -267,7 +268,7 @@ class auth {
 			{
 			if (! empty ($event))
 				{
-				log::debug ('Auth event: ' . $event);
+				log::debug ("AUTH - {$event}");
 				}
 			
 			$this->sql->insert (array (
@@ -316,13 +317,13 @@ class auth {
 			{
 			// Check if the account is locked or not
 			if ($this->lockout_check ())
-				return $this->record_error ('To many login attempts, try again later');
+				return $this->record_error ('To many login attempts, try again later', false);
 			
 			if (empty ($this->user['status']))
-				return $this->record_error ('The account is currently inactive or unverified');
+				return $this->record_error ('The account is currently inactive or unverified', false);
 			
 			if ($this->groupid && isset ($this->user['group']) && ! $this->user['group']['status'])
-				return $this->record_error ('The group for the account is disabled');
+				return $this->record_error ('The group for the account is disabled', false);
 			
 			// Check the password against the database
 			if ($this->check ($password, $this->user['password']))
@@ -353,7 +354,7 @@ class auth {
 			$this->record_event (0, 'Invalid Username', $username);
 			}
 		
-		return $this->record_error ('The username and/or password is invalid');
+		return $this->record_error ('The username and/or password is invalid', false);
 		}
 	
 	/**
@@ -717,7 +718,7 @@ class auth {
 			
 			if ($this->group > 0 && $this->user['group'] != $this->group)
 				{
-				return $this->record_error ('You do not belong to this group');
+				return $this->record_error ('You do not belong to this group', 'warning');
 				}
 			
 			if ($this->db_sessions)
@@ -747,23 +748,23 @@ class auth {
 					
 					if (! isset ($session))
 						{
-						return $this->record_error ('Could not find your session data');
+						return $this->record_error ('Could not find your session data', 'info');
 						}
 					
 					if ($session['sessionid'] != $_SESSION['session_id'])
 						{
-						return $this->record_error ('The sessionid in the database does not match');
+						return $this->record_error ('The sessionid in the database does not match', 'warning');
 						}
 					
 					// Do we want to validate the IP address every time? Make sure they match
 					if ($this->validate && ($session['ip'] != $this->address))
 						{
-						return $this->record_error ('IP address failed validation. Maybe it changed?');
+						return $this->record_error ('IP address failed validation. Maybe it changed?', 'warning');
 						}
 					}
 					else
 					{
-					return $this->record_error ('Session was not found in the database');
+					return $this->record_error ('Session was not found in the database', 'info');
 					}
 				}
 			
@@ -1160,7 +1161,7 @@ class auth {
 	 */
 	public function user_update_password ($authid, $password)
 		{
-		log::warning ('Changing the users password: ' . $authid);
+		log::warning ("Changing the users password: {$authid}");
 		
 		$password = $this->encrypt ($password);
 		
