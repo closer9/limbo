@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1191';
+	public static $version	= '0.1.5.1192';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -279,8 +279,8 @@ class limbo
 		}
 	
 	/**
-	 * Loads the configuration file for this instance. It will try to find a file named 'subdomain.config.php'
-	 * based on the subdomain in the url (if there is one).
+	 * Loads the configuration file for this instance. It will try to find a file named '<domain>.config.php'
+	 * based on the current called domain name.
 	 *
 	 * If the script is called via CLI, it will look into the config files themselves, looking
 	 * for the 'path.dir' variable to see if that config matches it's own directory structure.
@@ -295,10 +295,12 @@ class limbo
 		
 		if ($this->invoked_from () == 'web')
 			{
-			self::$config['web.subdomain'] = substr ($_SERVER['HTTP_HOST'], 0, strpos ($_SERVER['HTTP_HOST'], '.'));
+			self::$config['web.domain'] = $_SERVER['HTTP_HOST'];
 			
-			if (is_file (self::$config['config.dir'] . self::$config['web.subdomain'] . '.config.php'))
-				self::$config['config.file'] = self::$config['web.subdomain'] . '.config.php';
+			if (is_file (self::$config['config.dir'] . self::$config['web.domain'] . '.config.php'))
+				{
+				self::$config['config.file'] = self::$config['web.domain'] . '.config.php';
+				}
 			}
 
 		if ($this->invoked_from () == 'cli')

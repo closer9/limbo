@@ -1,0 +1,5 @@
+# Exclude all custom configs in this directory
+*
+
+# Except the default config.
+!default.config.php
