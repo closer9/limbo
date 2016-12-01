@@ -51,12 +51,9 @@ class args
 					}
 					else
 					{
-					$chars = str_split (substr ($arg, 1));
-
-					foreach ($chars as $char)
+					foreach (str_split (substr ($arg, 1)) as $c)
 						{
-						$key = $char;
-						$out[$key] = isset($out[$key]) ? $out[$key] : true;
+						$out[$c] = isset ($out[$c]) ? ((int) $out[$c] > 0) ? (int) $out[$c] + 1 : $out[$c] : true;
 						}
 					}
 				}
