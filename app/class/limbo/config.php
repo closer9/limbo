@@ -25,6 +25,12 @@ namespace limbo;
  *   limbo::config ()->delete ('variable_name', 'group_name');
  *   limbo::config ('group_name')->set ('variable_name', null);
  * 
+ * Common way to initialize defaults and load variables in a config.inc.php
+ *   limbo::config ('group_name')->defaults (array (
+ *      'var1' => 'test',
+ *      'var2' => false
+ *      ))->load ();
+ * 
  * @package limbo
  */
 class config
@@ -45,6 +51,11 @@ class config
 	protected $enabled = false;
 	
 	/**
+	 * @var array This stores default configuration data that populates the DB when load() is called
+	 */
+	protected $defaults;
+	
+	/**
 	 * @var string The current configuration group we're manipulating 
 	 */
 	public $group;
@@ -61,6 +72,26 @@ class config
 		log::debug ("CONFIG - Starting the configuration object");
 		
 		return $this->group ($group);
+		}
+	
+	/**
+	 * Manually set the MySQL object. Useful when initializing this from the CLI.
+	 *
+	 * @param mysql $sql The already created MySQL object
+	 *
+	 * @throws error
+	 * @return config
+	 */
+	public function sql ($sql)
+		{
+		if (! $sql instanceof mysql)
+			{
+			throw new error ('You must pass the \limbo\mysql object to this method');
+			}
+		
+		$this->sql = $sql;
+		
+		return $this;
 		}
 	
 	/**
@@ -91,11 +122,16 @@ class config
 		// Return true if we've already checked and everything is good
 		if ($this->enabled) return true;
 		
-		if (is_registered ('SQL') && ! is_object ($this->sql))
+		// If we haven't specified the sql object, check if it's been registered in the IOC
+		if (! is_object ($this->sql) && is_registered ('SQL'))
+			{
+			$this->sql = \limbo::ioc ('sql');
+			}
+		
+		if ($this->sql instanceof mysql)
 			{
 			log::debug ('CONFIG - SQL object is registered');
 			
-			$this->sql = \limbo::ioc ('sql');
 			$this->sql_table = \limbo::$config['limbo.config_table'];
 			
 			if ($this->sql_table)
@@ -128,12 +164,49 @@ class config
 		}
 	
 	/**
+	 * Set the default variables to set for this group. When you call load() it will check for defaults
+	 * and any variables that were not found in the database will automatically be set.
+	 *
+	 * @param array $defaults     An array of default configuration variables
+	 * @param string|null $group  If specified this will set the global object group
+	 *
+	 * @return config
+	 */
+	public function defaults (array $defaults, $group = null)
+		{
+		if ($this->check ())
+			{
+			if ($group !== null)
+				{
+				$this->group ($group);
+				}
+			
+			if (empty ($this->group))
+				{
+				trigger_error ('You can not set configuration defaults if there is no group defined', E_USER_WARNING);
+				}
+				else
+				{
+				log::debug ("CONFIG - Setting defaults for group '{$this->group}'");
+				
+				$this->defaults = $defaults;
+				}
+			}
+		
+		return $this;
+		}
+	
+	/**
 	 * Load a configuration variable/value from the database into the Limbo class's main $config
 	 * array to be called using the config() helper function. You can specify if you want to overwrite
 	 * the same variable if it already exists or not. If you don't specify the name of a variable all
 	 * of the variables for that group will be loaded.
 	 * 
-	 * @param string $name        The name of the variable you want to load
+	 * If a specific variable name is not requested and there are defaults specified we will attempt to
+	 * verify that all the defaults are accounted for. If some are found to be missing from the database they
+	 * are set into the database and loaded into limbo::$config.
+	 *
+	 * @param string $name        The name of the variable you want to load. If omitted, load all the groups vars
 	 * @param null|string $group  The variable group you want to read from (overrules the objects group var)
 	 * @param bool $overwrite     Overwrite the current variable in memory?
 	 *
@@ -143,27 +216,58 @@ class config
 		{
 		if ($this->check ())
 			{
-			$group = ($group !== null) ? $this->sql->clean ($group) : $this->group;
+			$group     = ($group !== null) ? $this->sql->clean ($group) : $this->group;
+			$variables = array ();
 			
-			log::debug ("CONFIG - Loading '{$this->group}' configuration");
-			
-			while ($record = $this->sql->loop ("SELECT * FROM {$this->sql_table} WHERE `group` = '{$group}'"))
+			if (! empty ($name))
 				{
-				// We want a specific config option loaded, skip everything else
-				if (! empty ($name) && $record['name'] != $name) continue;
+				log::debug ("CONFIG - Loading '{$name}' variable from group '{$group}'");
 				
-				// We don't want to overwrite memory and this name is already set, skip it.
-				if (! $overwrite && isset (\limbo::$config[$record['name']])) continue;
+				$name    = $this->sql->clean ($name);
+				$records = $this->sql->dump ("SELECT * FROM {$this->sql_table} WHERE `group` = '{$group}' AND name = '{$name}'");
+				}
+				else
+				{
+				log::debug ("CONFIG - Loading '{$group}' configuration variables");
 				
+				$records = $this->sql->dump ("SELECT * FROM {$this->sql_table} WHERE `group` = '{$group}'");
+				}
+			
+			foreach ($records as $record)
+				{
 				if ($record['json'])
 					{
 					$record['value'] = json_decode (base64_decode ($record['value']), true);
 					}
 				
+				// Record this for checking our defaults later
+				$variables[$record['name']] = true;
+				
+				// Do not store this if it's already set and overwrite is off
+				if (! $overwrite && isset (\limbo::$config[$record['name']])) continue;
+				
+				// Store the variable into the limbo object
 				if (is_null ($record['key']))
 					\limbo::$config[$record['name']] = $record['value'];
 					else
 					\limbo::$config[$record['name']][$record['key']] = $record['value'];
+				}
+			
+			// If we have defaults (and we're not overriding the group) try to set them in the database
+			if (! empty ($this->defaults) && empty ($name) && $group == $this->group)
+				{
+				log::debug ("CONFIG - Saving any default configuration variables for '{$this->group}'");
+				
+				foreach ($this->defaults as $name => $value)
+					{
+					if (! isset ($variables[$name]))
+						{
+						$this->set ($name, $value, null, false)->load ($name, null, $overwrite);
+						}
+					}
+				
+				// Clear the array so we don't try again
+				$this->defaults = array ();
 				}
 			}
 		
@@ -209,7 +313,7 @@ class config
 				{
 				foreach ($value as $key => $set)
 					{
-					if ($auto_delete && empty ($set))
+					if ($auto_delete && $set === null)
 						{
 						$this->delete ($name, $key, $group);
 						
@@ -230,7 +334,7 @@ class config
 				}
 				else
 				{
-				if ($auto_delete && empty ($value))
+				if ($auto_delete && $value === null)
 					{
 					return $this->delete ($name, null, $group);
 					}
