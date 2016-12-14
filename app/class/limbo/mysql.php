@@ -718,15 +718,17 @@ class mysql {
 		}
 	
 	/**
-	 * Returns the selected query as an array one row at a time
+	 * Returns the selected query as an array one row at a time. You can define the specific value to return
+	 * otherwise it returns all of the columns found as an array.
 	 *
-	 * @param string $query		      The optional query to execute
-	 * @param null   $key		      The key (column) of the array (row) to return
-	 * @param \mysqli_result $result  A previous MySQL result object
+	 * @param string         $query      The optional query to execute
+	 * @param string|null    $key        The key (column) of the array (row) to return
+	 * @param string|null    $value      A specific column to return
+	 * @param \mysqli_result $result     A previous MySQL result object
 	 *
-	 * @return array
+	 * @return string|array
 	 */
-	public function dump ($query = '', $key = null, \mysqli_result $result = null)
+	public function dump ($query = '', $key = null, $value = null, \mysqli_result $result = null)
 		{
 		$return = array ();
 		
@@ -743,14 +745,12 @@ class mysql {
 			{
 			while ($fetch = $this->fetch_result ($result))
 				{
+				$data = ($value !== null && isset ($fetch[$value])) ? $fetch[$value] : $fetch;
+				
 				if ($key === null)
-					{
-					$return[] = $fetch;
-					}
+					$return[] = $data;
 					else
-					{
-					$return[$fetch[$key]] = $fetch;
-					}
+					$return[$fetch[$key]] = $data;
 				}
 			}
 		
