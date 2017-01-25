@@ -35,6 +35,7 @@ schedule	null		Yes			The jobs cron expression schedule (* * * * *)
 output		null		No			A filename to save the output to
 enabled		true		No			Specifies if the job will run or not
 email		false		No			E-mail the output (must save to a file)
+timeout     600         No          Time until the job is considered timed-out
 
 * - You must specify either a command or a script (or both)
 ******************************************************************************/

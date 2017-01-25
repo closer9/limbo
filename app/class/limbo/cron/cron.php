@@ -120,7 +120,7 @@ class cron
 	 */
 	public function execute ($job)
 		{
-		lock::set ('scheduler.' . $job, 600);
+		lock::set ('scheduler.' . $job, $this->jobs[$job]['timeout']);
 		
 		// We want the output to go to a file
 		if ($this->jobs[$job]['output'] !== null)
@@ -241,7 +241,8 @@ class cron
 	 * enabled     true        No           Specifies if the job will run or not
 	 * email       false       No           E-mail the output (must save to a file)
 	 * production  'both'      No           Runs on production or not or both
-	 *
+	 * timeout     600         No           Time until the job is considered timed-out
+	 * 
 	 * - You must specify either a command or a script (or both)
 	 * 
 	 * @param string $name
@@ -280,7 +281,8 @@ class cron
 			'output'	 => null,
 			'enabled'	 => true,
 			'email'		 => false,
-			'production' => 'both'
+			'production' => 'both',
+			'timeout'    => 600,
 			);
 		
 		// And now overwrite the defaults
