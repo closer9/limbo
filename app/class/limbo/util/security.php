@@ -44,9 +44,9 @@ class security
 	/**
 	 * Verify an already created hash against variables.
 	 *
-	 * @param string $hash		The hash you are testing
-	 * @param array  $input		List of variables to test in the hash
-	 * @param int    $timeout	Timeout length in seconds / false
+	 * @param string   $hash    The hash you are testing
+	 * @param array    $input   List of variables to test in the hash
+	 * @param int|bool $timeout Timeout length in seconds / false
 	 * 
 	 * @return bool
 	 */
@@ -79,122 +79,84 @@ class security
 	/**
 	 * Encrypt data
 	 *
-	 * This method will encrypt data using a given key, vector, and cipher.
-	 * By default, this will encrypt data using the RIJNDAEL/AES 256 bit cipher. You
-	 * may override the default cipher and cipher mode by passing your own desired
-	 * cipher and cipher mode as the final key-value array argument.
+	 * @param string $data     Data to be encrypted
+	 * @param string $password The encryption password
+	 * @param string $method   The cipher method to use
 	 *
-	 * @param  string $data The unencrypted data
-	 * @param  string $key The encryption key
-	 * @param  string $iv The encryption initialization vector
-	 * 
 	 * @return string
-	 * @throws \limbo\error if mcrypt is not loaded
+	 * @throws \error
 	 */
-	public static function encrypt ($data, $key, $iv = '')
+	public static function encrypt ($data, $password, $method = 'AES-256-CTR')
 		{
-		if (! extension_loaded ('mcrypt'))
+		if (mb_strlen ($password, '8bit') !== 32)
 			{
-			throw new \limbo\error ('Module mcrypt is not available! Unable to encrypt the submitted data!');
+			throw new \error ("The encryption password needs to be 256-bit");
 			}
 		
-		if (empty ($data)) return false;
+		$length   = openssl_cipher_iv_length ($method);
+		$password = openssl_digest ($password, 'md5', true);
+		$iv       = self::generate_iv ($length);
+		$data     = openssl_encrypt ($data, $method, $password, OPENSSL_RAW_DATA, $iv);
 		
-		if (empty ($iv))
-			{
-			$iv = self::generate_iv ();
-			}
-		
-		$module 	= mcrypt_module_open (MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_CBC, '');
-		$size_iv	= mcrypt_enc_get_iv_size ($module);
-		$size_key 	= mcrypt_enc_get_key_size ($module);
-		
-		if (strlen ($iv) > $size_iv)
-			{
-			$iv = substr ($iv, 0, $size_iv);
-			}
-		
-		if (strlen ($key) > $size_key)
-			{
-			$key = substr ($key, 0, $size_key);
-			}
-		
-		// Encrypt value
-		mcrypt_generic_init ($module, $key, $iv);
-		$res = mcrypt_generic ($module, $data);
-		mcrypt_generic_deinit ($module);
-		
-		return $iv . $res;
+		return $iv . $data;
 		}
 	
 	/**
 	 * Decrypt data
 	 *
-	 * This method will decrypt data using a given key, vector, and cipher.
-	 * By default, this will decrypt data using the RIJNDAEL/AES 256 bit cipher. You
-	 * may override the default cipher and cipher mode by passing your own desired
-	 * cipher and cipher mode as the final key-value array argument.
+	 * @param string $data     Data to be decrypted
+	 * @param string $password The encryption password
+	 * @param string $method   The cipher method to use
 	 *
-	 * @param  string $data The encrypted data
-	 * @param  string $key The encryption key
-	 * @param  string $iv The encryption initialization vector
-	 * 
 	 * @return string
-	 * @throws \limbo\error if mcrypt is not loaded
+	 * @throws \error
 	 */
-	public static function decrypt ($data, $key, $iv = '')
+	public static function decrypt ($data, $password, $method = 'AES-256-CTR')
 		{
-		if (! extension_loaded ('mcrypt'))
+		if (mb_strlen ($password, '8bit') !== 32)
 			{
-			throw new \limbo\error ('Module mcrypt is not available! Unable to decrypt the submitted data!');
+			throw new \error ("The encryption password needs to be 256-bit");
 			}
 		
-		if (empty ($data)) return false;
+		$length   = openssl_cipher_iv_length ($method);
+		$password = openssl_digest ($password, 'md5', true);
+		$iv 	  = mb_substr ($data, 0, $length, '8bit');
+		$data	  = mb_substr ($data, $length, null, '8bit');
 		
-		$module 	= mcrypt_module_open (MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_CBC, '');
-		$size_iv 	= mcrypt_enc_get_iv_size ($module);
-		
-		if (empty ($iv))
-			{
-			$iv 	= substr ($data, 0, $size_iv);
-			$data	= substr ($data, $size_iv);
-			}
-		
-		mcrypt_generic_init ($module, $key, $iv);
-		
-		$dec = mdecrypt_generic ($module, $data);
-		$res = rtrim ($dec, "\0");
-		
-		mcrypt_generic_deinit ($module);
-		
-		return $res;
+		return openssl_decrypt ($data, $method, $password, OPENSSL_RAW_DATA, $iv);
 		}
 	
 	/**
-	 * Generates a standard 32 char IV for use in the encryption method
+	 * Generates a random string to use as an initialization vector when encrypting
+	 * 
+	 * @param int $length The length of the IV to generate
 	 * 
 	 * @return string
 	 */
-	public static function generate_iv ()
+	public static function generate_iv ($length = 16)
 		{
-		$size	= mcrypt_get_iv_size (MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CFB);
-		$iv		= mcrypt_create_iv ($size, MCRYPT_DEV_URANDOM);
+		if (function_exists ('random_bytes'))
+			{
+			return random_bytes ($length);
+			}
 		
-		return $iv;
+		return openssl_random_pseudo_bytes ($length);
 		}
 	
 	/**
 	 * Hashes the specified string using bcrypt
 	 * 
-	 * @param 	string 		$input 		The string you would like to hash
-	 * @param 	int    		$rounds		Number of rounds to calculate (bigger = longer)
-	 * @return 	string					The hashed string
+	 * @param  string $input  The string you would like to hash
+	 * @param  int    $rounds Number of rounds to calculate (bigger = longer)
+	 * 
+	 * @return string
+	 * @throws \error
 	 */
 	public static function bcrypt ($input, $rounds = 12)
 		{
 		if (CRYPT_BLOWFISH != 1)
 			{
-			throw new \limbo\error ('BCRYPT not supported in this installation.');
+			throw new \error ('BCRYPT not supported in this installation.');
 			}
 		
 		$work = str_pad ($rounds, 2, '0', STR_PAD_LEFT);

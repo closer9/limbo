@@ -1545,7 +1545,7 @@ class auth {
 				return security::bcrypt ($input);
 			
 			case 'aes':
-				return security::encrypt ($input, $this->pass_key, security::generate_iv ());
+				return security::encrypt ($input, $this->pass_key, 'AES-256-CTR');
 			}
 		
 		return md5 ($this->pass_salt . $input);
