@@ -84,7 +84,7 @@
 			response = iframe.contents ().find ('body');
 			
 			/* Process the results in the iframe */
-			$.fn.ajaxform.process (options, response.html ());
+			$.fn.ajaxform.process (options, response.text ());
 			
 			/* Stop watching the iframe */
 			iframe.unbind('load');
@@ -127,7 +127,7 @@
 		{
 		var results = '';
 		
-		/* Try to parse the responce as JSON */
+		/* Try to parse the response as JSON */
 		try {
 			results = jQuery.parseJSON (response);
 			}

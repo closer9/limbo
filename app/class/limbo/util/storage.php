@@ -14,65 +14,61 @@ class storage
 	/**
 	 * This method takes the $_FILES global and parses the array. For each file it finds it
 	 * moves it to the storage directory and returns the file information.
-	 * 
-	 * @param string $app				An identifier for the group of storage files
-	 * @param array $incoming_files		Normally the $_FILES global goes here
-	 * @param bool $overwrite			Overwrite files in storage
+	 *
+	 * @param string $app       An identifier for the group of storage files
+	 * @param array $incoming   A $_FILES global or an array consisting of 'name' and 'tmp_name'
+	 * @param bool $overwrite   Overwrite files in storage
+	 * @param bool $form_shift  If submitted by a form, we usually want to shift off the first key
 	 *
 	 * @return array of file(s) and their information (size, type, name, path)
+	 *
+	 * @throws \limbo\error
 	 */
-	public static function put ($app, array $incoming_files = array (), $overwrite = false)
+	public static function put ($app, array $incoming = array (), $overwrite = false, $form_shift = true)
 		{
+		$files  = ($form_shift) ? array_shift ($incoming) : $incoming;
 		$output = array ();
 		
-		if (is_array ($incoming_files))
+		if (empty ($files['name']) || empty ($files['tmp_name']))
 			{
-			$files = array_shift ($incoming_files);
-			
-			if (is_array ($files['error']))
+			throw new error ("The submitted file package is not valid. Please include a name and tmp_name.");
+			}
+		
+		// Correct the format of the array to match the multi-upload format, even if it's not
+		if (! is_array ($files['name']))
+			{
+			foreach ($files as $key => $value)
 				{
-				// Looks like there were multiple files uploaded
-				foreach ($files['error'] as $key => $error)
-					{
-					if ($error == UPLOAD_ERR_OK && is_uploaded_file ($files['tmp_name'][$key]))
-						{
-						$filename = ($overwrite) ? $files['name'][$key] : self::file_check ($app, $files['name'][$key]);
-						
-						if (move_uploaded_file ($files['tmp_name'][$key], self::path ($app, $filename, true)))
-							{
-							log::debug ("STORAGE - Saved {$files['name'][$key]} for {$app}");
-							
-							$output[] = array (
-								'path' => self::path ($app, $files['name'][$key], false),
-								'name' => $filename,
-								'mime' => $files['type'][$key],
-								'size' => $files['size'][$key],
-								);
-							}
-						}
-					}
+				$files[$key] = array ($value);
 				}
-				else
+			}
+		
+		foreach ($files['name'] as $key => $filename)
+			{
+			$package = array ();
+			
+			foreach ($files as $type => $values)
 				{
-				// A single file was uploaded
-				if (isset ($files['error']) && $files['error'] == UPLOAD_ERR_OK)
+				$package[$type] = $values[$key];
+				}
+			
+			if (isset ($package['error']) && $package['error'] != UPLOAD_ERR_OK)
+				{
+				log::warning ("STORAGE - File {$filename} failed to upload for {$app}");
+				
+				continue;
+				}
+			
+			if (is_uploaded_file ($package['tmp_name']))
+				{
+				$package['name'] = ($overwrite) ? $filename : self::file_check ($app, $filename);
+				$package['path'] = self::path ($app, $package['name'], false);
+				
+				if (move_uploaded_file ($package['tmp_name'], $package['path'] . $package['name']))
 					{
-					if (is_uploaded_file ($files['tmp_name']))
-						{
-						$filename = ($overwrite) ? $files['name'] : self::file_check ($app, $files['name']);
-						
-						if (move_uploaded_file ($files['tmp_name'], self::path ($app, $filename, true)))
-							{
-							log::debug ("STORAGE - Saved {$files['name']} for {$app}");
-							
-							$output[] = array (
-								'path' => self::path ($app, $files['name'], false),
-								'name' => $filename,
-								'mime' => $files['type'],
-								'size' => $files['size'],
-								);
-							}
-						}
+					log::debug ("STORAGE - Saved {$package['name']} for {$app}");
+					
+					$output[] = $package;
 					}
 				}
 			}
