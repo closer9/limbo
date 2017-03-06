@@ -223,10 +223,8 @@ class storage
 	 * @param string $type	The mime type of the file
 	 * @param int $size		The size of the file
 	 * @param bool $attach	Send the file as an attachment to the browser
-	 *
-	 * @return bool
 	 */
-	public static function download ($app, $file, $type = '', $size = 0, $attach = false, $cache = false)
+	public static function download ($app, $file, $type = '', $size = 0, $attach = false, $cache = false, $name = false)
 		{
 		log::debug ("STORAGE - Downloading {$file} for {$app}");
 		
@@ -235,12 +233,13 @@ class storage
 			$size = ($size) ? $size : file::info (self::path ($app, $file, true))['size'];
 			$type = ($type) ? $type : file::info (self::path ($app, $file, true))['mime'];
 			$mode = ($attach) ? 'attachment' : 'inline';
+			$name = ($name) ? $name : $file;
 			
 			\limbo::response()
 				->cache ($cache)
 				->header ('Content-Type', $type)
 				->header ('Content-Lenth', $size)
-				->header ('Content-Disposition', "{$mode}; filename=\"{$file}\"")
+				->header ('Content-Disposition', "{$mode}; filename=\"{$name}\"")
 				->write (self::get ($app, $file))
 				->send ();
 			}
