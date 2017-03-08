@@ -704,17 +704,28 @@ class mysql {
 	 */
 	public function loop ($query, $assoc = true)
 		{
-		static $result;
+		$hash = md5 ($query);
 		
-		if ($query != $this->sql_loop)
+		if (empty ($this->sql_loop[$hash]))
 			{
-			$result	= null;
-			$this->sql_loop = $query;
+			log::debug ("MYSQL - Starting new loop process: {$hash}");
 			
-			$result = $this->query ($query, false);
+			$this->sql_loop[$hash]['query']  = $query;
+			$this->sql_loop[$hash]['result'] = $this->query ($query, false);
+			$this->sql_loop[$hash]['rows']   = $this->rows (null, $this->sql_loop[$hash]['result']);
+			$this->sql_loop[$hash]['loop']   = 0;
 			}
 		
-		return $this->fetch_result ($result, $assoc);
+		$result = $this->fetch_result ($this->sql_loop[$hash]['result'], $assoc);
+		
+		if (($this->sql_loop[$hash]['loop'] ++) >= $this->sql_loop[$hash]['rows'])
+			{
+			log::debug ("MYSQL - Cleaning up finished loop: {$hash}");
+			
+			unset ($this->sql_loop[$hash]);
+			}
+		
+		return $result;
 		}
 	
 	/**

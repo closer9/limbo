@@ -133,7 +133,9 @@
 			}
 		catch (e)
 			{
-			alert ("Invalid JSON returned from the script:\n\n" + response);
+			alert ("Invalid JSON returned. Please check the console for errors.");
+			
+			console.log (response);
 			
 			return false;
 			}
