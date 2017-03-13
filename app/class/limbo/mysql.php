@@ -1136,6 +1136,39 @@ class mysql {
 		}
 	
 	/**
+	 * Updates a value in a JSON string stored in the database. If the key is not found in the JSON array
+	 * it will be inserted.
+	 *
+	 * @param int|string $id  The identifier of the row to select
+	 * @param mixed $name     The key for the JSON value you want to update
+	 * @param mixed $value    The new value for the stored variable
+	 * @param string $column  The column name that contains the JSON
+	 * @param string $table   The name of the table
+	 * @param string $marker  The column name to use as the ID
+	 *
+	 * @return int The affected rows (should be 1)
+	 */
+	public function json_update ($id, $name, $value, $column, $table = '', $marker = 'id')
+		{
+		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
+		$column	= $this->clean ($column);
+		$marker	= $this->clean ($marker);
+		$id		= $this->clean ($id);
+		
+		$result = $this->query ("SELECT `{$column}` FROM `{$table}` WHERE `{$marker}` = '{$id}'");
+		$result = $this->fetch_result ($result);
+		
+		if (($array = json_decode ($result[$column], true)) === null || empty ($array[$name]))
+			{
+			return $this->json_insert ($id, array ($name => $value), $column, $table, $marker);
+			}
+		
+		$array[$name] = $value;
+		
+		return $this->update ($id, array ($column => json_encode ($array)), $table, $marker);
+		}
+	
+	/**
 	 * Close the MySQL connection to the database
 	 */
 	public function disconnect ()
