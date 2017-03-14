@@ -1298,7 +1298,7 @@ class auth {
 		
 		if ($user = $this->user (array ('authid' => $authid), false))
 			{
-			$user_sections = json_decode ($this->user['sections'], true);
+			$user_sections = json_decode ($user['sections'], true);
 			
 			if ($key = array_search ($section, $user_sections))
 				{
