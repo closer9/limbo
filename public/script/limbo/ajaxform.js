@@ -34,7 +34,7 @@
 		var status		= true;
 		
 		/* Add the iframe if we don't already have one */
-		if ($('#' + options.iframeid).length == 0)
+		if ($('#' + options.iframeid).length === 0)
 			$('body').append ('<iframe id="' + options.iframeid + '" name="' + options.iframeid + '" style="display: none;" />');
 		
 		/* Process the form */
@@ -144,7 +144,7 @@
 		options.complete.apply (options.form, [results]);
 		
 		/* Adjust any supplied hash data */
-		if (results.hash != '')
+		if (typeof (results.hash) !== 'undefined')
 			{
 			document.location.hash = results.hash;
 			}
@@ -163,7 +163,7 @@
 				break;
 			
 			case 'redirect':
-				if (window.location == results.content)
+				if (window.location === results.content)
 					{ window.location.reload (); }
 					else
 					{ window.location = results.content; }

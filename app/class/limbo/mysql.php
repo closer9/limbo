@@ -796,7 +796,7 @@ class mysql {
 	 * @param array  $params	The array of key => value search pairs
 	 * @param string $table		The name of the table
 	 *
-	 * @return bool|array	False on failure, array of row data on success
+	 * @return bool|\mysqli_result False on failure, array of row data on success
 	 * 
 	 * @throws error if no search parameters are specified
 	 */
@@ -1063,10 +1063,11 @@ class mysql {
 	 * @param string $column	The column name that contains the JSON
 	 * @param string $table		The name of the table
 	 * @param string $marker	The column name to use as the ID
+	 * @param bool $keys        Specifies if you want to keep the keys or not
 	 *
 	 * @return int The affected rows (should be 1)
 	 */
-	public function json_insert ($id, $insert, $column, $table = '', $marker = 'id')
+	public function json_insert ($id, $insert, $column, $table = '', $marker = 'id', $keys = true)
 		{
 		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
 		$column	= $this->clean ($column);
@@ -1085,12 +1086,12 @@ class mysql {
 			{
 			foreach ($insert as $key => $value)
 				{
-				$array[$this->clean ($key)] = $this->clean ($value);
+				$array[$this->clean ($key)] = $this->clean_value ($value);
 				}
 			}
 			else
 			{
-			$insert = $this->clean ($insert);
+			$insert = $this->clean_value ($insert);
 			
 			if (array_search ($insert, $array) === false)
 				{
@@ -1098,7 +1099,9 @@ class mysql {
 				}
 			}
 		
-		return $this->update ($id, array ($column => json_encode ($array)), $table, $marker);
+		$insert = ($keys) ? $array : array_values ($array);
+		
+		return $this->update ($id, array ($column => json_encode ($insert)), $table, $marker);
 		}
 	
 	/**
@@ -1109,10 +1112,11 @@ class mysql {
 	 * @param string $column		The column name that contains the JSON
 	 * @param string $table			The name of the table
 	 * @param string $marker		The column name to use as the ID
-	 *
+	 * @param bool $keys            Specifies if you want to keep the keys or not
+	 * 
 	 * @return int The affected rows (should be 1)
 	 */
-	public function json_delete ($id, $delete, $column, $table = '', $marker = 'id')
+	public function json_delete ($id, $delete, $column, $table = '', $marker = 'id', $keys = true)
 		{
 		$table	= (empty ($table)) ? $this->sql_table : $this->clean ($table);
 		$column	= $this->clean ($column);
@@ -1128,7 +1132,9 @@ class mysql {
 				{
 				unset ($array[$position]);
 				
-				return $this->update ($id, array ($column => json_encode ($array)), $table, $marker);
+				$insert = ($keys) ? $array : array_values ($array);
+				
+				return $this->update ($id, array ($column => json_encode ($insert)), $table, $marker);
 				}
 			}
 		
