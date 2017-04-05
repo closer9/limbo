@@ -79,24 +79,27 @@ class security
 	/**
 	 * Encrypt data
 	 *
-	 * @param string $data     Data to be encrypted
-	 * @param string $password The encryption password
-	 * @param string $method   The cipher method to use
+	 * @param string $data   Data to be encrypted
+	 * @param string $key    The encryption password
+	 * @param string $method The cipher method to use
+	 * @param string $digest The key hashing method to use
+	 * @param bool   $raw    Output the hash as raw or not
 	 *
 	 * @return string
-	 * @throws \error
+	 * @throws \limbo\error
 	 */
-	public static function encrypt ($data, $password, $method = 'AES-256-CTR')
+	public static function encrypt ($data, $key, $method = 'AES-256-CTR', $digest = 'sha256', $raw = true)
 		{
-		if (mb_strlen ($password, '8bit') !== 32)
-			{
-			throw new \error ("The encryption password needs to be 256-bit");
-			}
+		if (! in_array ($method, openssl_get_cipher_methods (true)))
+			throw new \limbo\error ("The cipher method '{$method}' is not available");
 		
-		$length   = openssl_cipher_iv_length ($method);
-		$password = openssl_digest ($password, 'md5', true);
-		$iv       = self::generate_iv ($length);
-		$data     = openssl_encrypt ($data, $method, $password, OPENSSL_RAW_DATA, $iv);
+		if (! in_array ($digest, openssl_get_md_methods (true)))
+			throw new \limbo\error ("The digest method '{$digest}' is not available");
+		
+		$length = openssl_cipher_iv_length ($method);
+		$key    = openssl_digest ($key, $digest, $raw);
+		$iv     = self::generate_iv ($length);
+		$data   = openssl_encrypt ($data, $method, $key, OPENSSL_RAW_DATA, $iv);
 		
 		return $iv . $data;
 		}
@@ -104,26 +107,29 @@ class security
 	/**
 	 * Decrypt data
 	 *
-	 * @param string $data     Data to be decrypted
-	 * @param string $password The encryption password
-	 * @param string $method   The cipher method to use
+	 * @param string $data   Data to be decrypted
+	 * @param string $key    The encryption password
+	 * @param string $method The cipher method to use
+	 * @param string $digest The key hashing method to use
+	 * @param bool   $raw    Output the hash as raw or not
 	 *
 	 * @return string
-	 * @throws \error
+	 * @throws \limbo\error
 	 */
-	public static function decrypt ($data, $password, $method = 'AES-256-CTR')
+	public static function decrypt ($data, $key, $method = 'AES-256-CTR', $digest = 'sha256', $raw = true)
 		{
-		if (mb_strlen ($password, '8bit') !== 32)
-			{
-			throw new \error ("The encryption password needs to be 256-bit");
-			}
+		if (! in_array ($method, openssl_get_cipher_methods (true)))
+			throw new \limbo\error ("The cipher method '{$method}' is not available");
 		
-		$length   = openssl_cipher_iv_length ($method);
-		$password = openssl_digest ($password, 'md5', true);
-		$iv 	  = mb_substr ($data, 0, $length, '8bit');
-		$data	  = mb_substr ($data, $length, null, '8bit');
+		if (! in_array ($digest, openssl_get_md_methods (true)))
+			throw new \limbo\error ("The digest method '{$digest}' is not available");
 		
-		return openssl_decrypt ($data, $method, $password, OPENSSL_RAW_DATA, $iv);
+		$length = openssl_cipher_iv_length ($method);
+		$key    = openssl_digest ($key, $digest, $raw);
+		$iv     = mb_substr ($data, 0, $length, '8bit');
+		$data   = mb_substr ($data, $length, null, '8bit');
+		
+		return openssl_decrypt ($data, $method, $key, OPENSSL_RAW_DATA, $iv);
 		}
 	
 	/**
@@ -136,11 +142,12 @@ class security
 	public static function generate_iv ($length = 16)
 		{
 		if (function_exists ('random_bytes'))
-			{
 			return random_bytes ($length);
-			}
 		
-		return openssl_random_pseudo_bytes ($length);
+		if (function_exists ('openssl_random_pseudo_bytes'))
+			return openssl_random_pseudo_bytes ($length);
+		
+		return self::generate ('symbols', $length);
 		}
 	
 	/**
@@ -152,24 +159,13 @@ class security
 	 * @return string
 	 * @throws \error
 	 */
-	public static function bcrypt ($input, $rounds = 12)
+	public static function bcrypt ($input, $rounds = 13)
 		{
 		if (CRYPT_BLOWFISH != 1)
-			{
-			throw new \error ('BCRYPT not supported in this installation.');
-			}
+			throw new \error ('BCRYPT is not supported in this installation.');
 		
 		$work = str_pad ($rounds, 2, '0', STR_PAD_LEFT);
-		
-		if (function_exists ('openssl_random_pseudo_bytes'))
-			{
-			$salt = openssl_random_pseudo_bytes (16);
-			}
-			else
-			{
-			$salt = self::generate ('symbols', 40);
-			}
-		
+		$salt = self::generate_iv (22);
 		$salt = substr (strtr (base64_encode ($salt), '+', '.'), 0 , 22);
 		
 		return crypt ($input, '$2a$' . $work . '$' . $salt);

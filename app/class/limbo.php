@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1203';
+	public static $version	= '0.1.5.1204';
 	
 	/**
 	 * @var array Contains the array of configuration options
@@ -90,15 +90,16 @@ class limbo
 		
 		date_default_timezone_set (config ('limbo.timezone'));
 		
+		ini_set ('log_errors', 'On');
+		ini_set ('error_log', config ('log.path') . 'php_errors.log');
+		
 		if (config ('limbo.production'))
 			{
-			ini_set ('log_errors', 'On');
 			ini_set ('display_errors', 'Off');
 			ini_set ('error_reporting', E_ERROR | E_WARNING);
 			}
 			else
 			{
-			ini_set ('log_errors', 'On');
 			ini_set ('display_errors', 'On');
 			ini_set ('error_reporting', E_ALL | E_STRICT);
 			}
