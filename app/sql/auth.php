@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `%%?%%` (
   PRIMARY KEY (`authid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO `auth_users` (`username`, `password`, `group`) VALUES ('admin', '\$2a\$12\$bLkIZA2q1hSMh1qQUkNYkeF5.GEneTgg.qfokHW1eoWSjdsnRV7JG', 0)
+INSERT INTO `%%?%%` (`username`, `password`, `group`) VALUES ('admin', '\$2a\$12\$bLkIZA2q1hSMh1qQUkNYkeF5.GEneTgg.qfokHW1eoWSjdsnRV7JG', 0);
 DB_USERS;
 
 $sql['db_audit'] = <<<DB_AUDIT

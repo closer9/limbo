@@ -284,7 +284,7 @@ class mysql {
 		
 		log::debug ('Creating new table: ' . $table);
 		
-		return $this->query (preg_replace ('/\%\%\?\%\%/', $table, $sql));
+		return $this->query (preg_replace ('/\%\%\?\%\%/', $table, $sql), true, true);
 		}
 	
 	/**
@@ -444,13 +444,14 @@ class mysql {
 	/**
 	 * Execute a query on the database server
 	 * 
-	 * @param string $query		The query to execute
-	 * @param bool $save		Save the result set internally as well as return it
+	 * @param string $query The query to execute
+	 * @param bool $save    Save the result set internally as well as return it
+	 * @param bool $multi   Execute a multi-SQL statement
 	 *
 	 * @return bool|\mysqli_result	True on un-savable queries / result set on all others
 	 * @throws error				If no connection is available
 	 */
-	public function query ($query, $save = true)
+	public function query ($query, $save = true, $multi = false)
 		{
 		$this->record ($query);
 		
@@ -459,9 +460,21 @@ class mysql {
 			throw new error ('No MySQL connection available');
 			}
 		
-		if (! $this->mysql->real_query ($query))
+		if ($multi)
 			{
-			throw new error ("MySQL failed: {$this->mysql->error} <br> {$query}");
+			if (! $this->mysql->multi_query ($query))
+				{
+				throw new error ("MySQL failed: {$this->mysql->error} <br> {$query}");
+				}
+			
+			while ($this->mysql->more_results ()) { $this->mysql->next_result (); }
+			}
+			else
+			{
+			if (! $this->mysql->real_query ($query))
+				{
+				throw new error ("MySQL failed: {$this->mysql->error} <br> {$query}");
+				}
 			}
 		
 		if ($this->mysql->field_count)
