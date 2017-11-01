@@ -18,6 +18,10 @@ $config['path.class']	= array (
 	$config['path.app'] . 'class/'
 	);
 
+/* Cronjob config */
+$config['cron.enabled'] = true;
+$config['cron.table']   = 'limbo_crons';
+
 /* Website related configuration */
 $config['web.title']	= 'Limbo';
 $config['web.ssl']		= false;

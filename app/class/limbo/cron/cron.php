@@ -53,27 +53,55 @@ class cron
 	 */
 	public function run ()
 		{
-		if (! $this->enabled) return;
+		if (! $this->enabled || config ('cron.enabled') === false) return;
+		
+		if (config ('cron.table'))
+			{
+			$SQL = new \limbo\mysql (config ('database.options'));
+			$SQL->connect ();
+			
+			$build_file = config ('path.app') . 'sql/cron.php';
+			
+			// Check if we're allowed to build tables and if there is a SQL file
+			if (config ('limbo.build_tables') && is_readable ($build_file))
+				{
+				log::debug ('CONFIG - Attempting to create the cron database table');
+				
+				require ($build_file);
+				
+				if (isset ($build))
+					{
+					$SQL->create_table (config ('cron.table'), $build);
+					}
+				}
+			
+			while ($job = $SQL->loop ("SELECT * FROM `" . config ('cron.table') . "` WHERE `enabled` = 1"))
+				{
+				$this->add ($job['process'], (array) $job);
+				}
+			}
 		
 		foreach ($this->jobs as $name => $settings)
 			{
 			if (! $settings['enabled'])
 				continue;
 			
-			if (config ('limbo.production') && $settings['production'] === false)
+			// Skip if this is a non-production only job and we're production
+			if ($settings['runmode'] === 1 && config ('limbo.production'))
 				continue;
 			
-			if (! config ('limbo.production') && $settings['production'] === true)
+			// Skip if this is a production only job and we're not production
+			if ($settings['runmode'] === 2 && ! config ('limbo.production'))
 				continue;
 			
 			$schedule = expr\CronExpression::factory ($settings['schedule']);
-
+			
 			if ($schedule->isDue ())
 				{
 				if (lock::get ('scheduler.' . $name))
 					{
 					log::error ('CRON - Unable to run scheduled job "' . $name . '". Lock file exists.');
-
+					
 					continue;
 					}
 				
@@ -94,19 +122,44 @@ class cron
 	 */
 	public function process ($job)
 		{
-		if (! isset ($this->jobs[$job]))
-			{
-			throw new error ('Unknown scheduled job "' . $job . '"');
-			}
+		log::info ("CRON - Running scheduled job '{$job}'");
 		
 		if (lock::get ('scheduler.' . $job))
 			{
-			throw new error ('Unable to run scheduled job "' . $job . '". Lock file exists.');
+			throw new error ("Unable to run scheduled job '{$job}'. Lock file exists.");
 			}
 		
-		log::info ('CRON - Running scheduled job "' . $job . '"');
-
-		$this->execute ($job);
+		if (isset ($this->jobs[$job]))
+			{
+			$this->execute ($job);
+			
+			return;
+			}
+		
+		if (config ('cron.table'))
+			{
+			$SQL = new \limbo\mysql (config ('database.options'));
+			$SQL->connect ();
+			
+			$cron = $SQL->prefetch ("SELECT * FROM `?` WHERE `process` = ?", array (
+				config ('cron.table'),
+				$job
+			));
+			
+			if (isset ($cron['process']))
+				{
+				$SQL->update ($cron['process'], array (
+					'lastrun' => date ('Y-m-d H:i:s')
+				), config ('cron.table'), 'process');
+				
+				$this->add ($cron['process'], (array) $cron);
+				$this->execute ($cron['process']);
+				
+				return;
+				}
+			}
+		
+		throw new error ("Unknown scheduled job '{$job}'");
 		}
 	
 	/**
@@ -126,7 +179,7 @@ class cron
 		if ($this->jobs[$job]['output'] !== null)
 			{
 			// Are they specifying a file path?
-			if (strpos ($this->jobs[$job]['output'], '/') === false)
+			if ($this->jobs[$job]['output'] === true || $this->jobs[$job]['output'] === '1')
 				{
 				if ($this->jobs[$job]['output'] === true)
 					$output = config ('path.storage') . 'logs/' . $job . '.txt';
@@ -254,6 +307,8 @@ class cron
 		{
 		$name = preg_replace ('/\s/', '', $name);
 		
+		log::debug ("CRON - Adding new job: {$name}");
+		
 		foreach (array ("schedule") as $field)
 			{
 			if (empty ($settings[$field]))
@@ -281,7 +336,7 @@ class cron
 			'output'	 => null,
 			'enabled'	 => true,
 			'email'		 => false,
-			'production' => 'both',
+			'runmode'    => 0,
 			'timeout'    => 600,
 			);
 		
