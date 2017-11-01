@@ -77,6 +77,12 @@ class cron
 			
 			while ($job = $SQL->loop ("SELECT * FROM `" . config ('cron.table') . "` WHERE `enabled` = 1"))
 				{
+				// Remove any previously set jobs with this name.
+				if (isset ($this->jobs[$job['process']]))
+					{
+					unset ($this->jobs[$job['process']]);
+					}
+				
 				$this->add ($job['process'], (array) $job);
 				}
 			}
@@ -124,16 +130,9 @@ class cron
 		{
 		log::info ("CRON - Running scheduled job '{$job}'");
 		
-		if (lock::get ('scheduler.' . $job))
+		if (lock::get ("scheduler.{$job}"))
 			{
 			throw new error ("Unable to run scheduled job '{$job}'. Lock file exists.");
-			}
-		
-		if (isset ($this->jobs[$job]))
-			{
-			$this->execute ($job);
-			
-			return;
 			}
 		
 		if (config ('cron.table'))
@@ -144,19 +143,23 @@ class cron
 			$cron = $SQL->prefetch ("SELECT * FROM `?` WHERE `process` = ?", array (
 				config ('cron.table'),
 				$job
-			));
+				));
 			
 			if (isset ($cron['process']))
 				{
 				$SQL->update ($cron['process'], array (
 					'lastrun' => date ('Y-m-d H:i:s')
-				), config ('cron.table'), 'process');
+					), config ('cron.table'), 'process');
 				
 				$this->add ($cron['process'], (array) $cron);
-				$this->execute ($cron['process']);
-				
-				return;
 				}
+			}
+		
+		if (isset ($this->jobs[$job]))
+			{
+			$this->execute ($job);
+			
+			return;
 			}
 		
 		throw new error ("Unknown scheduled job '{$job}'");
