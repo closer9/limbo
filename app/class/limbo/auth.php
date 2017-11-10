@@ -787,7 +787,7 @@ class auth {
 				}
 			}
 		
-		log::info ('No matching authenticated session found');
+		log::debug ('No matching authenticated session found');
 		
 		return false;
 		}
