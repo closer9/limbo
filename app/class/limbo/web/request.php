@@ -1,7 +1,7 @@
 <?php
 namespace limbo\web;
 
-use \limbo\util\string;
+use \limbo\util\strings;
 use \limbo\util\collection;
 
 /**
@@ -111,7 +111,7 @@ class request
 		$this->files 	= new collection ($_FILES);
 		
 		// Try to figure out the real relative path and section of the request
-		$fullpath 		= string::reduce_multiples (config ('path.section') . $this->page, '/');
+		$fullpath 		= strings::reduce_multiples (config ('path.section') . $this->page, '/');
 		$this->path 	= substr ($this->pid, 0, strrpos ($this->pid, '/') + 1);
 		$this->section 	= substr ($fullpath, 0, strrpos ($fullpath, '/') + 1);
 		
@@ -139,7 +139,7 @@ class request
 		
 		if (is_file (config ('path.section') . $this->page))
 			{
-			$this->file = string::reduce_multiples (config ('path.section') . $this->page, '/');
+			$this->file = strings::reduce_multiples (config ('path.section') . $this->page, '/');
 			
 			if (function_exists ('finfo_file'))
 				{

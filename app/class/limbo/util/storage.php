@@ -182,11 +182,11 @@ class storage
 		
 		if (self::file_verify ($app, $output))
 			{
-			$output = string::increment ($output, '-', 1, true);
+			$output = strings::increment ($output, '-', 1, true);
 			
 			while (self::file_verify ($app, $output) === true)
 				{
-				$output = string::increment ($output, '-', 1, true);
+				$output = strings::increment ($output, '-', 1, true);
 				}
 			
 			log::debug ("STORAGE - Renaming {$file} to {$output} for {$app}");

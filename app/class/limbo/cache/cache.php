@@ -78,8 +78,6 @@ abstract class cache implements driver
 	
 	public function stats ($option = array ())
 		{
-		log::debug ("Fetching statistics for cached key '{$keyword}'");
-		
 		return $this->driver_stats ($option);
 		}
 	

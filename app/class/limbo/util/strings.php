@@ -6,7 +6,7 @@ namespace limbo\util;
  * 
  * @package limbo\util
  */
-class string
+class strings
 	{
 	/**
 	 * Shorten up a string by the given length

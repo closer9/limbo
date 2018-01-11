@@ -126,7 +126,7 @@ if (! function_exists ('shorten'))
 	{
 	function shorten ($input, $length, $html = false)
 		{
-		return limbo\util\string::shorten ($input, $length, $html);
+		return limbo\util\strings::shorten ($input, $length, $html);
 		}
 	}
 
