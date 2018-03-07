@@ -92,10 +92,8 @@
 				return;
 				}
 			}
-			else
-			{
-			$.fn.pagination.settings['this'].show ();
-			}
+		
+		$.fn.pagination.settings['this'].show ();
 		
 		var page_last = Math.ceil ($.fn.pagination.settings['total'] / $.fn.pagination.settings['display']);
 		var page_curr = $.fn.pagination.settings['page'];
