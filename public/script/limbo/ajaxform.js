@@ -79,7 +79,7 @@
 		var response	= '';
 		
 		/* This will catch when the iframe is loaded */
-		iframe = $('#' + options.iframeid).load (function ()
+		iframe = $('#' + options.iframeid).on('load', function ()
 			{
 			response = iframe.contents ().find ('body');
 			
