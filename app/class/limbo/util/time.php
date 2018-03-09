@@ -7,8 +7,7 @@ namespace limbo\util;
  * Class time
  * @package limbo\util
  */
-class time
-	{
+class time {
 	/**
 	 * Get the current time in microtime format
 	 * 
@@ -111,10 +110,11 @@ class time
 	 * @param string $datetime	The @timestamp or Y-m-d H:i:s datetime
 	 * @param int $depth		The amount of detail to display 1 = least, 7 = max
 	 * @param bool $append		Append the 'ago' or 'from now' string
+	 * @param int $fuzz         Make the exact time meeting point fuzzy, 0 = off
 	 * 
 	 * @return string The time in a natural string
 	 */
-	static function difference ($datetime, $depth = 1, $append = true)
+	static function difference ($datetime, $depth = 1, $append = true, $fuzz = 15)
 		{
 		$now	= new \DateTime;
 		$marker	= new \DateTime ($datetime);
@@ -149,9 +149,9 @@ class time
 		
 		$string = array_slice ($string, 0, ($depth));
 		
-		if (abs ($marker->getTimestamp () - $now->getTimestamp ()) < 30)
+		if ($fuzz > 0 && abs ($marker->getTimestamp () - $now->getTimestamp ()) < $fuzz)
 			{
-			return 'Just now';
+			return ($mode == ' ago') ? 'Just now' : 'Right now';
 			}
 		
 		return implode (', ', $string) . (($append) ? $mode : '');
