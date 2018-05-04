@@ -41,7 +41,7 @@ class limbo
 	/**
 	 * @var string The version of the Limbo application
 	 */
-	public static $version	= '0.1.5.1209';
+	public static $version	= '0.1.5.1210';
 	
 	/**
 	 * @var array Contains the array of configuration options

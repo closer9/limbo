@@ -65,7 +65,7 @@ class cron {
 			// Check if we're allowed to build tables and if there is a SQL file
 			if (config ('limbo.build_tables') && is_readable ($build_file))
 				{
-				log::debug ('CONFIG - Attempting to create the cron database table');
+				log::debug ('CRON - Attempting to create the cron database table');
 				
 				require ($build_file);
 				
@@ -75,11 +75,13 @@ class cron {
 					}
 				}
 			
-			while ($job = $SQL->loop ("SELECT * FROM `" . config ('cron.table') . "` WHERE `enabled` = 1"))
+			while ($job = $SQL->loop ("SELECT * FROM `" . config ('cron.table') . "`"))
 				{
 				// Remove any previously set jobs with this name.
 				if (isset ($this->jobs[$job['process']]))
 					{
+					log::debug ("CRON - Removing already configured cronjob '{$job['process']}'");
+					
 					unset ($this->jobs[$job['process']]);
 					}
 				
@@ -90,12 +92,16 @@ class cron {
 		foreach ($this->jobs as $name => $settings)
 			{
 			if (! $settings['enabled'])
+				{
+				log::debug ("CRON - Skipping cronjob '{$name}' because it's disabled");
+				
 				continue;
+				}
 			
 			// Skip if this is a non-production only job and we're production
 			if ($settings['runmode'] === 1 && config ('limbo.production'))
 				{
-				log::debug ("Skipping cronjob '{$name}' because it's a non-production only job");
+				log::debug ("CRON - Skipping cronjob '{$name}' because it's a non-production only job");
 				
 				continue;
 				}
@@ -103,7 +109,7 @@ class cron {
 			// Skip if this is a production only job and we're not production
 			if ($settings['runmode'] === 2 && ! config ('limbo.production'))
 				{
-				log::debug ("Skipping cronjob '{$name}' because its a production only job");
+				log::debug ("CRON - Skipping cronjob '{$name}' because its a production only job");
 				
 				continue;
 				}
